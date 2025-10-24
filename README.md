@@ -13,3 +13,7 @@ Data flow of image selection:
 Data flow of image uploading:
 
 ![](/docs/image_upload_flow.png)
+
+## Frontend
+
+Using Vite as build tool.
