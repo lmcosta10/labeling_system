@@ -6,8 +6,10 @@ use axum::{
 };
 use serde::Serialize;
 use tower_http::cors::{Any, CorsLayer};
+
 mod user;
 mod auth;
+mod image;
 
 #[derive(Serialize)] // convert struct to json string later
 struct Image {
@@ -30,6 +32,7 @@ async fn main() {
     let app = Router::new()
         .route("/api/images", get(get_images))
         .route("/api/login", post(crate::auth::handler::login_user))
+        .route("/api/image/{id}",get(crate::image::handler::handle_image))
         .layer(cors);
 
     let api_addr = env::var("API_ADDR").unwrap(); // TODO: replace unwrap
