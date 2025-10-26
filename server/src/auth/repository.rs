@@ -11,7 +11,7 @@ pub fn get_user_by_username(username: String) -> Result<model::User, anyhow::Err
 
     for result in rdr.records() {
         let record = result?;
-        if record[0] == username.to_string() {
+        if record[0].to_string() == username {
             return Ok(model::User { // TODO: organize database
                 is_admin: record[2].parse::<i32>().unwrap() == 1,
                 username: record[0].to_string(),
