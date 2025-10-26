@@ -1,11 +1,13 @@
 use dotenv::dotenv;
 use std::env;
 use axum::{
-    routing::{get},
+    routing::{get, post},
     Json, Router,
 };
 use serde::Serialize;
 use tower_http::cors::{Any, CorsLayer};
+mod user;
+mod auth;
 
 #[derive(Serialize)] // convert struct to json string later
 struct Image {
@@ -27,6 +29,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/api/images", get(get_images))
+        .route("/api/login", post(crate::auth::handler::login_user))
         .layer(cors);
 
     let api_addr = env::var("API_ADDR").unwrap(); // TODO: replace unwrap
@@ -38,8 +41,6 @@ async fn main() {
 }
 
 async fn get_images() -> Json<Vec<Image>> {
-    println!("got image list request\n"); // TODO: remove
-
     // TODO: currently, dummy data
 
     // TODO: not depend on frontend expected structure?
