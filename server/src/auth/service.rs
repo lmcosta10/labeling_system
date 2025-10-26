@@ -1,5 +1,5 @@
 use serde::Serialize;
-use crate::user::model::User;
+use crate::{auth::repository::get_user_by_username};
 use anyhow::Result;
 
 #[derive(Serialize)]
@@ -9,14 +9,9 @@ pub struct LoginResponse {
 }
 
 pub async fn handle_user(username: String, password: String) -> Result<LoginResponse, anyhow::Error> {
-    // TODO: find user by name fn in repository
-    let user = User {
-        is_admin: false,
-        username: username,
-        password: "hey".to_string()
-    };
+    let user = get_user_by_username(username).unwrap(); // TODO: replace unwrap
 
-    println!("Usuario {}", user.username);
+    println!("Usuario {} é admin?: {}", user.username, user.is_admin);
 
     if user.password == password {
         Ok(LoginResponse {
