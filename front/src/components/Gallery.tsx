@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
+import {type Image} from "./Image";
 
-type Image = {
-  id: number;
-  title: string;
-  url: string;
-};
+interface GalleryProps {
+    onImageClick: (image: Image) => void;
+}
 
-export default function Gallery() {
+export default function Gallery({ onImageClick }: GalleryProps) {
     const [images, setImages] = useState<Image[]>([]);
     const [loading, setLoading] = useState(true);
     
@@ -33,7 +32,7 @@ export default function Gallery() {
     <div>
         <h2>Image Gallery</h2>
         {images.map((img) => (
-        <div key={img.id}>
+        <div key={img.id} onClick={() => onImageClick(img)}>
             <img src={img.url} width={200} />
             <p>{img.title}</p>
         </div>
