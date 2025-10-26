@@ -4,7 +4,7 @@ use std::env;
 use crate::user::model;
 
 pub fn get_user_by_username(username: String) -> Result<model::User, anyhow::Error> {
-    let filename = env::var("DB_FILENAME").unwrap();
+    let filename = env::var("USER_DB_FILENAME").unwrap(); // TODO: replace unwrap
 
     let file = File::open(filename)?;
     let mut rdr = csv::Reader::from_reader(file);
