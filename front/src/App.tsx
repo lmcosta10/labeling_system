@@ -1,12 +1,39 @@
-//import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Gallery from "./components/Gallery";
+import Login from "./components/Login";
 
 const App: React.FC = () => {
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // check saved login status
+    const logged = localStorage.getItem("loggedIn") === "true";
+
+    setLoggedIn(logged);
+  }, []);
+
+  const handleLoginSuccess = () => {
+    setLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    setLoggedIn(false);
+  };
+
   return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif", textAlign: "center" }}>
+    <div>
       <h1>Page</h1>
 
-      <Gallery />
+      {!loggedIn ? (
+        <Login onLoginSuccess={handleLoginSuccess} />
+      ) : (
+        <>
+          <p>Welcome User!</p>
+          <Gallery />
+          <button onClick={handleLogout}>Logout</button>
+        </>
+      )}
     </div>
   );
 };
