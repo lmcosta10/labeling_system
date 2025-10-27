@@ -33,6 +33,7 @@ async fn main() {
         .route("/api/images", get(get_images))
         .route("/api/login", post(crate::auth::handler::login_user))
         .route("/api/image/{id}",get(crate::image::handler::handle_image))
+        .route("/api/image/{id}/tags",post(crate::image::handler::handle_tag_post))
         .layer(cors);
 
     let api_addr = env::var("API_ADDR").unwrap(); // TODO: replace unwrap
