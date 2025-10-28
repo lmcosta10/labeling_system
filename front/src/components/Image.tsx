@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 export type Image = {
   id: number;
-  title: string;
   url: string;
 };
 
@@ -141,8 +140,7 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
       </div>
 
       <div className="my-4">
-        <img src={selectedImage.url} width={200} alt={selectedImage.title} />
-        <p>{selectedImage.title}</p>
+        <img src={selectedImage.url} width={200} />
       </div>
 
       <div className="flex flex-wrap gap-3 mb-6">

@@ -34,7 +34,6 @@ export default function Gallery({ onImageClick }: GalleryProps) {
         {images.map((img) => (
         <div key={img.id} onClick={() => onImageClick(img)}>
             <img src={img.url} width={200} />
-            <p>{img.title}</p>
         </div>
         ))}
     </div>
