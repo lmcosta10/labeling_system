@@ -13,7 +13,13 @@ export default function Gallery({ onImageClick }: GalleryProps) {
         async function fetchImages() {
             const API_BASE = import.meta.env.VITE_API_URL;
             try {
-            const response = await fetch(`${API_BASE}/api/images`);
+                const userToken: string | null = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/api/images`, {
+                    method: 'GET',
+                    headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}`}
+                });
             if (!response.ok) throw new Error("Failed to fetch images");
             const data = await response.json();
             setImages(data);
