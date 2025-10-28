@@ -1,6 +1,7 @@
 use axum::{Json, http::StatusCode, extract::Path};
 use serde::Deserialize;
 use crate::image::service;
+use crate::image::model::Image;
 
 #[derive(Deserialize)]
 pub struct PostTagInfo {
@@ -27,4 +28,10 @@ pub async fn handle_tag_post(
         Ok(resp) => Ok(Json(resp)),
         Err(err) => Err((StatusCode::NO_CONTENT, err.to_string())),
     }
+}
+
+pub async fn handle_gallery(
+    
+) -> Result<Json<Vec<Image>>, (StatusCode, String)> {
+    Ok(Json(service::get_gallery().await))
 }

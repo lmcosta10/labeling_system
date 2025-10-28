@@ -1,12 +1,38 @@
 use std::fs::{File, OpenOptions};
 use std::env;
- use csv::WriterBuilder;
+use csv::WriterBuilder;
+use crate::image::model::Image;
 
 #[derive(serde::Serialize)]
 pub struct TagList {
     pub img_id: u32,
     pub tags_names: Vec<String>,
     pub tags_approved: Vec<u8>
+}
+
+pub fn get_all_images() -> Result<Vec<Image>, anyhow::Error> {
+    let filename = env::var("IMAGE_DB_FILENAME").unwrap(); // TODO: replace unwrap
+
+    let file = File::open(&filename)?;
+    let mut rdr = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_reader(file);
+
+    let mut found_images: Vec<Image> = Vec::new();
+
+    for result in rdr.records() {
+        let record = result?;
+
+        let img_id = record[0].parse::<u32>().unwrap();
+        
+        found_images.push(
+            Image{
+                id: img_id,
+                url: record[1].to_string(),
+            }
+        );
+    }
+    Ok(found_images)
 }
 
 pub fn get_image_tags(id: u32) -> Result<TagList, anyhow::Error> {

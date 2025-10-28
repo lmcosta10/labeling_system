@@ -1,5 +1,7 @@
 use serde::Serialize;
-use crate::image::repository::{get_image_tags, set_new_tag};
+use crate::image::repository::{
+    get_image_tags, set_new_tag, get_all_images};
+use crate::image::model::Image;
 use anyhow::Result;
 
 #[derive(Serialize)]
@@ -14,6 +16,10 @@ pub struct ImgResponse {
 pub struct TagResponse {
     pub success: bool,
     pub message: String
+}
+
+pub async fn get_gallery() -> Vec<Image> {
+    get_all_images().unwrap()
 }
 
 pub async fn get_image_data(id: u32) -> Result<ImgResponse, anyhow::Error> {
