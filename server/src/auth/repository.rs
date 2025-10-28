@@ -1,5 +1,7 @@
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use std::env;
+
+use csv::WriterBuilder;
 
 use crate::user::model;
 
@@ -20,4 +22,19 @@ pub fn get_user_by_username(username: String) -> Result<model::User, anyhow::Err
         }
     }
     Err(anyhow::anyhow!("Did not find user"))
+}
+
+pub fn add_session(username: String, token: String) {
+    let filename = env::var("SESSION_DB_FILENAME").unwrap(); // TODO: replace unwrap
+
+    let file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(&filename).unwrap();
+
+    let mut wtr = WriterBuilder::new()
+        .has_headers(false) // false for appending
+        .from_writer(file);
+
+    let _ = wtr.write_record(&[username, token]);
 }
