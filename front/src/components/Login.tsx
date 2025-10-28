@@ -24,11 +24,16 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       });
 
       if (response.ok) {
-        const data = await response.json(); // TODO: handle
+        const data = await response.json();
 
-        setMessage("Login successful!");
-        localStorage.setItem("loggedIn", "true");
-        onLoginSuccess();
+        if (data.success && data.token) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("loggedIn", "true");
+          setMessage("Login successful!");
+          onLoginSuccess();
+        } else {
+          setMessage("Login failed. No token received.");
+        }
       } else {
         setMessage("Login failed. Please check your credentials.");
       }
