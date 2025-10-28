@@ -1,3 +1,4 @@
+use axum::http::HeaderMap;
 use axum::{Json, http::StatusCode, extract::Path};
 use serde::Deserialize;
 use crate::image::service;
@@ -31,7 +32,17 @@ pub async fn handle_tag_post(
 }
 
 pub async fn handle_gallery(
-    
+    headers: HeaderMap
 ) -> Result<Json<Vec<Image>>, (StatusCode, String)> {
-    Ok(Json(service::get_gallery().await))
+    let token = extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string()))?;
+
+    Ok(Json(service::get_gallery(token).await))
+}
+
+fn extract_token(headers: &HeaderMap) -> Option<String> {
+    let header = headers.get("Authorization")?;
+    let header_str = header.to_str().ok()?;
+
+    // Expect: "Bearer <token>"
+    header_str.strip_prefix("Bearer ").map(|t| t.to_string())
 }

@@ -1,6 +1,7 @@
 use serde::Serialize;
 use crate::image::repository::{
-    get_image_tags, set_new_tag, get_all_images};
+    get_image_tags, set_new_tag, get_all_images_by_group, get_username_from_session,
+    get_group_from_username};
 use crate::image::model::Image;
 use anyhow::Result;
 
@@ -18,15 +19,16 @@ pub struct TagResponse {
     pub message: String
 }
 
-pub async fn get_gallery() -> Vec<Image> {
-    get_all_images().unwrap()
+pub async fn get_gallery(token: String) -> Vec<Image> {
+    let username = get_username_from_session(token);
+
+    let group = get_group_from_username(username);
+
+    get_all_images_by_group(group).unwrap()
 }
 
 pub async fn get_image_data(id: u32) -> Result<ImgResponse, anyhow::Error> {
     let tag_list = get_image_tags(id).unwrap(); // TODO: replace unwrap
-
-    // for debugging
-    // println!("Image tags: {:?}", tag_list.tags_names);
 
     if !tag_list.tags_names.is_empty() {
         Ok(ImgResponse {
@@ -46,10 +48,10 @@ pub async fn post_tag_user(img_id: u32, action: String, tag_name: Option<String>
             let _ = set_new_tag(img_id, tag_name.unwrap()); // TODO: handle response
         }
         "edit" => {
-            println!("Edit");
+            println!("Edit"); // TODO
         }
         "delete" => {
-            println!("Delete");
+            println!("Delete"); // TODO
         }
         _ => return Err(anyhow::anyhow!("Invalid action: {}", action)),
     }

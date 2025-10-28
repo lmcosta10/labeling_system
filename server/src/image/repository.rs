@@ -35,6 +35,53 @@ pub fn get_all_images() -> Result<Vec<Image>, anyhow::Error> {
     Ok(found_images)
 }
 
+pub fn get_all_images_by_group(group: i32) -> Result<Vec<Image>, anyhow::Error> {
+    let img_ids = get_all_images_ids_by_group(group);
+
+    let filename = env::var("IMAGE_DB_FILENAME").unwrap(); // TODO: replace unwrap
+
+    let file = File::open(&filename).unwrap();
+    let mut rdr = csv::Reader::from_reader(file);
+
+    let mut found_images: Vec<Image> = Vec::new();
+
+    for result in rdr.records() {
+        let record = result.unwrap();
+
+        let img_id = record[0].parse::<u32>().unwrap();
+        
+        if img_ids.contains(&img_id) {
+            found_images.push(
+                Image{
+                    id: img_id,
+                    url: record[1].to_string(),
+                }
+            );
+        }
+    }
+    Ok(found_images)
+}
+
+pub fn get_all_images_ids_by_group(group: i32) -> Vec<u32> {
+    let filename = env::var("IMGGROUP_DB_FILENAME").unwrap(); // TODO: replace unwrap
+
+    let file = File::open(&filename).unwrap();
+    let mut rdr = csv::Reader::from_reader(file);
+
+    let mut found_images_ids: Vec<u32> = Vec::new();
+
+    for result in rdr.records() {
+        let record = result.unwrap();
+
+        let img_group = record[1].parse::<i32>().unwrap();
+        
+        if img_group == group {
+            found_images_ids.push(record[0].parse::<u32>().unwrap())
+        }
+    }
+    found_images_ids
+}
+
 pub fn get_image_tags(id: u32) -> Result<TagList, anyhow::Error> {
     let filename = env::var("TAGS_DB_FILENAME").unwrap(); // TODO: replace unwrap
 
@@ -85,4 +132,40 @@ pub fn set_new_tag(id: u32, tag_name: String) -> Result<u8, anyhow::Error> {
 
     // TODO: handle error
     Ok(1)
+}
+
+pub fn get_username_from_session(token: String) -> String {
+    let filename = env::var("SESSION_DB_FILENAME").unwrap(); // TODO: replace unwrap
+
+    let file = File::open(&filename).unwrap();
+    let mut rdr = csv::Reader::from_reader(file);
+
+    let mut username = String::new();
+
+    for result in rdr.records() {
+        let record = result.unwrap();
+
+        if record[1].to_string() == token {
+            username = record[0].to_string();
+        }
+    }
+    username
+}
+
+pub fn get_group_from_username(username: String) -> i32 {
+    let filename = env::var("USERGROUP_DB_FILENAME").unwrap(); // TODO: replace unwrap
+
+    let file = File::open(&filename).unwrap();
+    let mut rdr = csv::Reader::from_reader(file);
+
+    let mut group = -1; // -1 for when the user is not in any group
+
+    for result in rdr.records() {
+        let record = result.unwrap();
+
+        if record[0].to_string() == username {
+            group = record[1].parse::<i32>().unwrap();
+        }
+    }
+    group
 }
