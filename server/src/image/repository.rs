@@ -169,3 +169,21 @@ pub fn get_group_from_username(username: String) -> i32 {
     }
     group
 }
+
+pub fn get_is_admin_from_username(username: String) -> bool {
+    let filename = env::var("USER_DB_FILENAME").unwrap(); // TODO: replace unwrap
+
+    let file = File::open(&filename).unwrap();
+    let mut rdr = csv::Reader::from_reader(file);
+
+    let mut is_admin = false;
+
+    for result in rdr.records() {
+        let record = result.unwrap();
+
+        if record[0].to_string() == username {
+            is_admin = record[2].parse::<u32>().unwrap() > 0;
+        }
+    }
+    is_admin
+}

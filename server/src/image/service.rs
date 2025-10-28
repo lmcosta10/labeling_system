@@ -1,7 +1,8 @@
 use serde::Serialize;
 use crate::image::repository::{
-    get_image_tags, set_new_tag, get_all_images_by_group, get_username_from_session,
-    get_group_from_username};
+    get_all_images, get_all_images_by_group, get_group_from_username,
+    get_image_tags, get_username_from_session, set_new_tag,
+    get_is_admin_from_username};
 use crate::image::model::Image;
 use anyhow::Result;
 
@@ -22,9 +23,16 @@ pub struct TagResponse {
 pub async fn get_gallery(token: String) -> Vec<Image> {
     let username = get_username_from_session(token);
 
-    let group = get_group_from_username(username);
+    let is_admin = get_is_admin_from_username(username.clone());
 
-    get_all_images_by_group(group).unwrap()
+    if is_admin {
+        get_all_images().unwrap()
+    }
+    else {
+        let group = get_group_from_username(username.clone());
+
+        get_all_images_by_group(group).unwrap()
+    }
 }
 
 pub async fn get_image_data(id: u32) -> Result<ImgResponse, anyhow::Error> {
