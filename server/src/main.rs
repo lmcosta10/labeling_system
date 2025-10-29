@@ -10,6 +10,7 @@ mod user;
 mod auth;
 mod image;
 mod tags_requests;
+mod ai;
 
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 2)]
@@ -31,6 +32,7 @@ async fn main() {
         .route("/api/tags/pending",get(crate::tags_requests::handler::handle_tags_requests_page))
         .route("/api/tags/{name}/approve",post(crate::tags_requests::handler::handle_tag_approval))
         .route("/api/tags/{name}/reject",post(crate::tags_requests::handler::handle_tag_rejection))
+        .route("/api/image/{id}/ai",get(crate::ai::handler::handle_ai_suggestion_request))
         .layer(cors);
 
     let api_addr = env::var("API_ADDR").unwrap(); // TODO: replace unwrap
