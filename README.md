@@ -9,7 +9,13 @@ There are some steps you need to take if you want to run this yourself:
 
 ## Using the site
 
-If you want to log in as admin, log in as Bob. If you want to log in as a standard user, log in as Alice. Their data is at server/src/database/user_database.csv.
+If you want to test the site, you can get the data from the databases in /server/src/database, but, to make it simple:
+* Users are alice, bob and charlie
+* All of the users' passwords are simply "password"
+* alice belongs to group 1
+* bob is an admin
+* charlie does not belong to any group
+* Group 1 has two images (rust crab and Google logo)
 
 ## Details
 
