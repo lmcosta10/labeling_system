@@ -1,34 +1,48 @@
 import React, { useState, useEffect } from "react";
-import ImageDetails, {type Image} from "./components/Image";
+import ImageDetails, { type Image } from "./components/Image";
 import Gallery from "./components/Gallery";
 import Login from "./components/Login";
+import TagsApprovalPage from "./components/TagsApproval";
 
 const App: React.FC = () => {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
+  const [view, setView] = useState<"gallery" | "details" | "admin">("gallery");
 
   useEffect(() => {
-    // TODO: use token
     const logged = localStorage.getItem("loggedIn") === "true";
-
     setLoggedIn(logged);
+
+    const admin = localStorage.getItem("isAdmin") === "true";
+    setIsAdmin(admin);
   }, []);
 
   const handleLoginSuccess = () => {
     setLoggedIn(true);
+    const admin = localStorage.getItem("isAdmin") === "true";
+    setIsAdmin(admin);
   };
 
   const handleLogout = () => {
     localStorage.clear();
     setLoggedIn(false);
+    setIsAdmin(false);
+    setView("gallery");
   };
 
   const handleImageClick = (image: Image) => {
     setSelectedImage(image);
+    setView("details");
   };
 
   const handleBackToGallery = () => {
     setSelectedImage(null);
+    setView("gallery");
+  };
+
+  const goToAdminPanel = () => {
+    if (isAdmin) setView("admin");
   };
 
   return (
@@ -37,15 +51,26 @@ const App: React.FC = () => {
 
       {!loggedIn ? (
         <Login onLoginSuccess={handleLoginSuccess} />
-      ) : !selectedImage? (
+      ) : view === "admin" && isAdmin ? (
         <>
-          <p>Welcome User!</p>
-          <Gallery onImageClick={handleImageClick}/>
+          <button onClick={() => setView("gallery")}>Back</button>
+          <TagsApprovalPage />
           <button onClick={handleLogout}>Logout</button>
-          
+        </>
+      ) : view === "details" && selectedImage ? (
+        <>
+          <ImageDetails selectedImage={selectedImage} onImageClick={handleBackToGallery} />
+          <button onClick={handleLogout}>Logout</button>
         </>
       ) : (
-        <ImageDetails selectedImage={selectedImage} onImageClick={handleBackToGallery}/>
+        <>
+          <p>Welcome User!</p>
+          <Gallery onImageClick={handleImageClick} />
+          {isAdmin && (
+            <button onClick={goToAdminPanel}>Go to Admin Panel</button>
+          )}
+          <button onClick={handleLogout}>Logout</button>
+        </>
       )}
     </div>
   );
