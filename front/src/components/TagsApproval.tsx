@@ -6,11 +6,13 @@ import { useEffect, useState, type ReactNode, type MouseEventHandler } from "rea
 /**
  * Defines the structure of a Tag object.
  */
-interface Tag {
+interface TagRequest {
+  req_key: number,
   img_url: string;
   operation: string;
   old_name: string;
   new_name: string;
+  pending: boolean
 }
 
 /**
@@ -100,12 +102,14 @@ const X: React.FC<XProps> = ({ className }) => (
 // -- Logics --
 
 export default function TagsApprovalPage() {
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [tags, setTags] = useState<TagRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const API_BASE = import.meta.env.VITE_API_URL;
+  const userToken: string | null = localStorage.getItem('token');
+
   async function fetchPendingTags() {
-    const API_BASE = import.meta.env.VITE_API_URL;
     try {
       setLoading(true);
       setError(null);
@@ -119,6 +123,7 @@ export default function TagsApprovalPage() {
       );
       if (!response.ok) throw new Error("Failed to fetch tags");
       const data = await response.json();
+      console.log(data)
       setTags(data);
     } catch (e) {
       if (e instanceof Error) {
@@ -131,13 +136,13 @@ export default function TagsApprovalPage() {
     }
   }
 
-  async function handleApprove(name: string) {
-    await fetch(`/api/tags/${name}/approve`, { method: "POST" });
+  async function handleApprove(req_key: number) {
+    await fetch(`${API_BASE}/api/tags/${req_key}/approve`, { method: "POST", headers: { 'Authorization': `Bearer ${userToken}` }});
     fetchPendingTags();
   }
 
-  async function handleReject(name: string) {
-    await fetch(`/api/tags/${name}/reject`, { method: "POST" });
+  async function handleReject(req_key: number) {
+    await fetch(`${API_BASE}/api/tags/${req_key}/reject`, { method: "POST", headers: { 'Authorization': `Bearer ${userToken}` }});
     fetchPendingTags();
   }
 
@@ -153,35 +158,35 @@ export default function TagsApprovalPage() {
     <div>
       <h1 className="text-2xl font-semibold mb-4">Pending Tags</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {tags.map((tag,index) => (
-          // Replaced <Card> with a <div>, adding bg-white and border for a card-like feel
-          <div
-            key={index}
-            className="shadow-md rounded-2xl bg-white border border-gray-200"
-          >
-            {/* Replaced <CardContent> with a <div> */}
-            <div className="p-4">
-              <p className="text-lg font-medium mb-2">{tag.new_name}</p>
-              <img src={tag.img_url} />
-              <div className="flex gap-2">
-                {/* Now using our custom Button and Check components */}
-                <Button
-                  onClick={() => handleApprove(tag.new_name)}
-                  className="flex items-center gap-1"
+        {tags.filter(tag => tag.pending).map((tag) => (
+            // Replaced <Card> with a <div>, adding bg-white and border for a card-like feel
+            <div
+                key={tag.req_key} // Using req_key for a stable key
+                className="shadow-md rounded-2xl bg-white border border-gray-200"
                 >
-                  <Check className="w-4 h-4" /> Approve
-                </Button>
-                {/* Now using our custom Button and X components */}
-                <Button
-                  onClick={() => handleReject(tag.new_name)}
-                  variant="destructive"
-                  className="flex items-center gap-1"
-                >
-                  <X className="w-4 h-4" /> Reject
-                </Button>
-              </div>
+                {/* Replaced <CardContent> with a <div> */}
+                <div className="p-4">
+                <p className="text-lg font-medium mb-2">{tag.new_name}</p>
+                <img src={tag.img_url} />
+                <div className="flex gap-2">
+                    {/* Now using our custom Button and Check components */}
+                    <Button
+                    onClick={() => handleApprove(tag.req_key)}
+                    className="flex items-center gap-1"
+                    >
+                    <Check className="w-4 h-4" /> Approve
+                    </Button>
+                    {/* Now using our custom Button and X components */}
+                    <Button
+                    onClick={() => handleReject(tag.req_key)}
+                    variant="destructive"
+                    className="flex items-center gap-1"
+                    >
+                    <X className="w-4 h-4" /> Reject
+                    </Button>
+                </div>
+                </div>
             </div>
-          </div>
         ))}
       </div>
     </div>

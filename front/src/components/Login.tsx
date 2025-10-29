@@ -28,6 +28,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
         if (data.success && data.token) {
           localStorage.setItem("token", data.token);
+          localStorage.setItem("isAdmin", data.is_admin);
           localStorage.setItem("loggedIn", "true");
           setMessage("Login successful!");
           onLoginSuccess();

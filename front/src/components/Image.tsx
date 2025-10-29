@@ -43,7 +43,7 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
           // Combine both arrays into TagState[]
           const combined = names.map((name, i) => ({
             name,
-            approved: approvedFlags[i] === 1, // convert 0/1 to boolean
+            approved: true, // TODO
           }));
 
           setTags(combined);
@@ -90,7 +90,6 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
     // and can be manipulated by the user, but the database should not be affected
     setTags((prev) => [...prev, newTagObj]);
     setNewTag("");
-    console.log(trimmed)
     await sendTagForApproval("add", trimmed);
   };
 
