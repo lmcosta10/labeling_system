@@ -21,6 +21,7 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
   const [newTag, setNewTag] = useState("");
   const [editingTag, setEditingTag] = useState<string | null>(null);
   const [editedValue, setEditedValue] = useState("");
+  const [aiSuggestion, setAISuggestion] = useState<string | null>(null);
 
   const API_BASE = import.meta.env.VITE_API_URL;
   const imageUrlStart = `${API_BASE}/api/image`;
@@ -80,6 +81,30 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
       console.error("Error sending tag for approval:", err);
     }
   }
+
+  // Get AI suggestion
+  async function getAISuggestion() {
+    try {
+      const response = await fetch(`${imageUrlStart}/${selectedImage.id}/ai`, {
+        method: "GET"
+      });
+
+      if (!response.ok) throw new Error("Failed to get AI suggestion");
+
+      const data = await response.json();
+      console.log(data.ai_response);
+
+      if (!data.success) {
+        console.warn("Server did not confirm success:", data);
+      }
+
+      setAISuggestion(data.ai_response ?? "No suggestion found");
+    } catch (err) {
+      console.error("Error getting AI suggestion:", err);
+      setAISuggestion("Error getting suggestion");
+    }
+  };
+
 
   // Add new tag (not approved / pending)
   const handleAddTag = async () => {
@@ -202,6 +227,18 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
           ))
         ) : (
           <p>No tags yet.</p>
+        )}
+        <button
+          onClick={getAISuggestion}
+          className="text-gray-500 hover:underline"
+        >
+          Get AI Suggestion
+        </button>
+
+        {aiSuggestion && (
+          <div className="mt-2 p-2 border border-gray-300 rounded bg-gray-50">
+            {aiSuggestion}
+          </div>
         )}
       </div>
 
