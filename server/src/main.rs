@@ -9,6 +9,7 @@ use tower_http::cors::{Any, CorsLayer};
 mod user;
 mod auth;
 mod image;
+mod tags_requests;
 
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 2)]
@@ -27,6 +28,7 @@ async fn main() {
         .route("/api/login", post(crate::auth::handler::login_user))
         .route("/api/image/{id}",get(crate::image::handler::handle_image))
         .route("/api/image/{id}/tags",post(crate::image::handler::handle_tag_post))
+        .route("/api/tags/pending",get(crate::tags_requests::handler::handle_tags_requests_page))
         .layer(cors);
 
     let api_addr = env::var("API_ADDR").unwrap(); // TODO: replace unwrap

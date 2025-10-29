@@ -212,3 +212,19 @@ pub fn get_is_admin_from_username(username: String) -> bool {
     }
     is_admin
 }
+
+pub fn get_image_from_id(id: u32) -> Image {
+    let filename = env::var("IMAGE_DB_FILENAME").unwrap(); // TODO: replace unwrap
+
+    let file = File::open(&filename).unwrap();
+    let mut rdr = csv::Reader::from_reader(file);
+
+    for result in rdr.records() {
+        let record = result.unwrap();
+
+        if record[0].parse::<u32>().unwrap() == id {
+            return Image { id: id, url: record[1].to_string() };
+        }
+    }
+    Image { id: 0, url: "".to_string() } // TODO: handle error
+}
