@@ -1,1 +1,2 @@
-img_id,operation,old_tag,new_tag
+req_key,img_id,operation,old_tag,new_tag,pending
+1,1,add,,testeee,1

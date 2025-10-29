@@ -29,6 +29,8 @@ async fn main() {
         .route("/api/image/{id}",get(crate::image::handler::handle_image))
         .route("/api/image/{id}/tags",post(crate::image::handler::handle_tag_post))
         .route("/api/tags/pending",get(crate::tags_requests::handler::handle_tags_requests_page))
+        .route("/api/tags/{name}/approve",post(crate::tags_requests::handler::handle_tag_approval))
+        .route("/api/tags/{name}/reject",post(crate::tags_requests::handler::handle_tag_rejection))
         .layer(cors);
 
     let api_addr = env::var("API_ADDR").unwrap(); // TODO: replace unwrap

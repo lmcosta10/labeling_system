@@ -1,6 +1,6 @@
 use std::fs::{File, OpenOptions};
 use std::env;
-use csv::WriterBuilder;
+use csv::{ReaderBuilder, WriterBuilder};
 use crate::image::model::Image;
 
 #[derive(serde::Serialize)]
@@ -105,59 +105,154 @@ pub fn get_image_tags(id: u32) -> Result<TagList, anyhow::Error> {
     })
 }
 
+// Set requests functions: by ChatGPT ---
 pub fn set_new_tag_request(id: u32, tag_name: String) -> Result<u8, anyhow::Error> {
-    let filename = env::var("TAGREQUESTS_DB_FILENAME").unwrap(); // TODO: replace unwrap
+    let filename = env::var("TAGREQUESTS_DB_FILENAME")?; 
 
+    // === 1) Read existing keys ===
+    let mut max_req_key: u32 = 0;
+
+    // CSV may not exist yet → OK
+    if let Ok(file) = std::fs::File::open(&filename) {
+        let mut rdr = ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(file);
+
+        for result in rdr.records() {
+            let record = result?;
+            if let Ok(k) = record.get(0).unwrap_or("0").parse::<u32>() {
+                if k > max_req_key {
+                    max_req_key = k;
+                }
+            }
+        }
+    }
+
+    // === 2) New req_key ===
+    let new_req_key = max_req_key + 1;
+
+    // === 3) Append new record ===
     let file = OpenOptions::new()
         .append(true)
         .create(true)
         .open(&filename)?;
 
     let mut wtr = WriterBuilder::new()
-        .has_headers(false) // false for appending
+        .has_headers(false)
         .from_writer(file);
 
-    wtr.write_record(&[id.to_string(), "add".to_string(), "".to_string(), tag_name])?;
+    wtr.write_record(&[
+        new_req_key.to_string(),
+        id.to_string(),
+        "add".to_string(),
+        "".to_string(),
+        tag_name,
+        "1".to_string(),
+    ])?;
 
-    // TODO: handle error
+    wtr.flush()?;
+
     Ok(1)
 }
 
 pub fn set_edit_tag_request(id: u32, tag_name: String, new_name: String) -> Result<u8, anyhow::Error> {
-    let filename = env::var("TAGREQUESTS_DB_FILENAME").unwrap(); // TODO: replace unwrap
+    let filename = env::var("TAGREQUESTS_DB_FILENAME")?; 
 
+    // === 1) Read existing keys ===
+    let mut max_req_key: u32 = 0;
+
+    // CSV may not exist yet → OK
+    if let Ok(file) = std::fs::File::open(&filename) {
+        let mut rdr = ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(file);
+
+        for result in rdr.records() {
+            let record = result?;
+            if let Ok(k) = record.get(0).unwrap_or("0").parse::<u32>() {
+                if k > max_req_key {
+                    max_req_key = k;
+                }
+            }
+        }
+    }
+
+    // === 2) New req_key ===
+    let new_req_key = max_req_key + 1;
+
+    // === 3) Append new record ===
     let file = OpenOptions::new()
         .append(true)
         .create(true)
         .open(&filename)?;
 
     let mut wtr = WriterBuilder::new()
-        .has_headers(false) // false for appending
+        .has_headers(false)
         .from_writer(file);
 
-    wtr.write_record(&[id.to_string(), "edit".to_string(), tag_name, new_name])?;
+    wtr.write_record(&[
+        new_req_key.to_string(),
+        id.to_string(),
+        "edit".to_string(),
+        tag_name,
+        new_name,
+        "1".to_string(),
+    ])?;
 
-    // TODO: handle error
+    wtr.flush()?;
+
     Ok(1)
 }
 
 pub fn set_delete_tag_request(id: u32, tag_name: String) -> Result<u8, anyhow::Error> {
-    let filename = env::var("TAGREQUESTS_DB_FILENAME").unwrap(); // TODO: replace unwrap
+let filename = env::var("TAGREQUESTS_DB_FILENAME")?; 
 
+    // === 1) Read existing keys ===
+    let mut max_req_key: u32 = 0;
+
+    // CSV may not exist yet → OK
+    if let Ok(file) = std::fs::File::open(&filename) {
+        let mut rdr = ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(file);
+
+        for result in rdr.records() {
+            let record = result?;
+            if let Ok(k) = record.get(0).unwrap_or("0").parse::<u32>() {
+                if k > max_req_key {
+                    max_req_key = k;
+                }
+            }
+        }
+    }
+
+    // === 2) New req_key ===
+    let new_req_key = max_req_key + 1;
+
+    // === 3) Append new record ===
     let file = OpenOptions::new()
         .append(true)
         .create(true)
         .open(&filename)?;
 
     let mut wtr = WriterBuilder::new()
-        .has_headers(false) // false for appending
+        .has_headers(false)
         .from_writer(file);
 
-    wtr.write_record(&[id.to_string(), "delete".to_string(), tag_name, "".to_string()])?;
+    wtr.write_record(&[
+        new_req_key.to_string(),
+        id.to_string(),
+        "delete".to_string(),
+        tag_name,
+        "".to_string(),
+        "1".to_string(),
+    ])?;
 
-    // TODO: handle error
+    wtr.flush()?;
+
     Ok(1)
 }
+// ---
 
 pub fn get_username_from_session(token: String) -> String {
     let filename = env::var("SESSION_DB_FILENAME").unwrap(); // TODO: replace unwrap
