@@ -47,7 +47,7 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <h1>Page</h1>
+      <h1>Labeler System</h1>
 
       {!loggedIn ? (
         <Login onLoginSuccess={handleLoginSuccess} />
