@@ -1,7 +1,8 @@
 use serde::Serialize;
 use crate::image::repository::{
     get_all_images, get_all_images_by_group, get_group_from_username,
-    get_image_tags, get_username_from_session, set_new_tag,
+    get_image_tags, get_username_from_session, set_new_tag_request,
+    set_edit_tag_request,set_delete_tag_request,
     get_is_admin_from_username};
 use crate::image::model::Image;
 use anyhow::Result;
@@ -10,8 +11,7 @@ use anyhow::Result;
 pub struct ImgResponse {
     pub success: bool,
     pub message: String,
-    pub tags_names: Vec<String>,
-    pub tags_approved: Vec<u8>
+    pub tags_names: Vec<String>
 }
 
 #[derive(Serialize)]
@@ -42,8 +42,7 @@ pub async fn get_image_data(id: u32) -> Result<ImgResponse, anyhow::Error> {
         Ok(ImgResponse {
             success: true,
             message: "Image data retrieval successful".to_string(),
-            tags_names: tag_list.tags_names,
-            tags_approved: tag_list.tags_approved
+            tags_names: tag_list.tags_names
         })
     } else {
         Err(anyhow::anyhow!("Error retrieving image data"))
@@ -53,13 +52,13 @@ pub async fn get_image_data(id: u32) -> Result<ImgResponse, anyhow::Error> {
 pub async fn post_tag_user(img_id: u32, action: String, tag_name: Option<String>, new_name: Option<String>) -> Result<TagResponse, anyhow::Error> {
     match action.as_str() {
         "add" => {
-            let _ = set_new_tag(img_id, tag_name.unwrap()); // TODO: handle response
+            let _ = set_new_tag_request(img_id, tag_name.unwrap()); // TODO: handle response
         }
         "edit" => {
-            println!("Edit"); // TODO
+            let _ = set_edit_tag_request(img_id, tag_name.unwrap(), new_name.unwrap());
         }
         "delete" => {
-            println!("Delete"); // TODO
+            let _ = set_delete_tag_request(img_id, tag_name.unwrap());
         }
         _ => return Err(anyhow::anyhow!("Invalid action: {}", action)),
     }

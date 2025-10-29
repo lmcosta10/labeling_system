@@ -7,6 +7,7 @@ use uuid::Uuid;
 pub struct LoginResponse {
     pub success: bool,
     pub message: String,
+    pub is_admin: bool,
     pub token: Option<String>
 }
 
@@ -21,6 +22,7 @@ pub async fn handle_user(username: String, password: String) -> Result<LoginResp
         Ok(LoginResponse {
             success: true,
             message: "Login successful".to_string(),
+            is_admin: user.is_admin,
             token: Some(token),
         })
     } else {
