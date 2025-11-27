@@ -105,154 +105,62 @@ pub fn get_image_tags(id: u32) -> Result<TagList, anyhow::Error> {
     })
 }
 
-// Set requests functions: by ChatGPT ---
-pub fn set_new_tag_request(id: u32, tag_name: String) -> Result<u8, anyhow::Error> {
-    let filename = env::var("TAGREQUESTS_DB_FILENAME")?; 
+pub fn set_new_tag_request(img_id: u32, tag_name: String) -> Result<u8, anyhow::Error> {
+    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
 
-    // === 1) Read existing keys ===
-    let mut max_req_key: u32 = 0;
+    // First, get neccessary info:
+    // - highest req_key (currently, new key is equal to the highest existing key + 1)
+    let highest_key_query = format!("SELECT MAX(req_key) FROM tagrequests");
+    let mut highest_key_statement = conn.prepare(highest_key_query)?;
+    let _ = highest_key_statement.next()?;
+    let mut req_key: i64 = highest_key_statement.read(0)?;
+    req_key = req_key + 1;
 
-    // CSV may not exist yet → OK
-    if let Ok(file) = std::fs::File::open(&filename) {
-        let mut rdr = ReaderBuilder::new()
-            .has_headers(false)
-            .from_reader(file);
-
-        for result in rdr.records() {
-            let record = result?;
-            if let Ok(k) = record.get(0).unwrap_or("0").parse::<u32>() {
-                if k > max_req_key {
-                    max_req_key = k;
-                }
-            }
-        }
-    }
-
-    // === 2) New req_key ===
-    let new_req_key = max_req_key + 1;
-
-    // === 3) Append new record ===
-    let file = OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(&filename)?;
-
-    let mut wtr = WriterBuilder::new()
-        .has_headers(false)
-        .from_writer(file);
-
-    wtr.write_record(&[
-        new_req_key.to_string(),
-        id.to_string(),
-        "add".to_string(),
-        "".to_string(),
-        tag_name,
-        "1".to_string(),
-    ])?;
-
-    wtr.flush()?;
-
-    Ok(1)
+    // Insert entry
+    let new_tag_query = format!("INSERT INTO tagrequests (req_key, img_id, operation, new_tag)
+    VALUES ({req_key},{img_id},'add','{tag_name}')"); // FIXME: make it safer (from sql injection)
+    let _new_tag_statement = conn.execute(new_tag_query)?;
+    
+    Ok(1) // TODO: handle errors
 }
 
-pub fn set_edit_tag_request(id: u32, tag_name: String, new_name: String) -> Result<u8, anyhow::Error> {
-    let filename = env::var("TAGREQUESTS_DB_FILENAME")?; 
+pub fn set_edit_tag_request(img_id: u32, tag_name: String, new_name: String) -> Result<u8, anyhow::Error> {
+    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
 
-    // === 1) Read existing keys ===
-    let mut max_req_key: u32 = 0;
+    // First, get neccessary info:
+    // - highest req_key (currently, new key is equal to the highest existing key + 1)
+    let highest_key_query = format!("SELECT MAX(req_key) FROM tagrequests");
+    let mut highest_key_statement = conn.prepare(highest_key_query)?;
+    let _ = highest_key_statement.next()?;
+    let mut req_key: i64 = highest_key_statement.read(0)?;
+    req_key = req_key + 1;
 
-    // CSV may not exist yet → OK
-    if let Ok(file) = std::fs::File::open(&filename) {
-        let mut rdr = ReaderBuilder::new()
-            .has_headers(false)
-            .from_reader(file);
-
-        for result in rdr.records() {
-            let record = result?;
-            if let Ok(k) = record.get(0).unwrap_or("0").parse::<u32>() {
-                if k > max_req_key {
-                    max_req_key = k;
-                }
-            }
-        }
-    }
-
-    // === 2) New req_key ===
-    let new_req_key = max_req_key + 1;
-
-    // === 3) Append new record ===
-    let file = OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(&filename)?;
-
-    let mut wtr = WriterBuilder::new()
-        .has_headers(false)
-        .from_writer(file);
-
-    wtr.write_record(&[
-        new_req_key.to_string(),
-        id.to_string(),
-        "edit".to_string(),
-        tag_name,
-        new_name,
-        "1".to_string(),
-    ])?;
-
-    wtr.flush()?;
-
-    Ok(1)
+    // Insert entry
+    let new_edit_tag_query = format!("INSERT INTO tagrequests (req_key, img_id, operation, old_tag, new_tag)
+    VALUES ({req_key},{img_id},'edit','{tag_name}', '{new_name}')"); // FIXME: make it safer (from sql injection)
+    let _new_edit_tag_statement = conn.execute(new_edit_tag_query)?;
+    
+    Ok(1) // TODO: handle errors
 }
 
-pub fn set_delete_tag_request(id: u32, tag_name: String) -> Result<u8, anyhow::Error> {
-let filename = env::var("TAGREQUESTS_DB_FILENAME")?; 
+pub fn set_delete_tag_request(img_id: u32, tag_name: String) -> Result<u8, anyhow::Error> {
+    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
 
-    // === 1) Read existing keys ===
-    let mut max_req_key: u32 = 0;
+    // First, get neccessary info:
+    // - highest req_key (currently, new key is equal to the highest existing key + 1)
+    let highest_key_query = format!("SELECT MAX(req_key) FROM tagrequests");
+    let mut highest_key_statement = conn.prepare(highest_key_query)?;
+    let _ = highest_key_statement.next()?;
+    let mut req_key: i64 = highest_key_statement.read(0)?;
+    req_key = req_key + 1;
 
-    // CSV may not exist yet → OK
-    if let Ok(file) = std::fs::File::open(&filename) {
-        let mut rdr = ReaderBuilder::new()
-            .has_headers(false)
-            .from_reader(file);
-
-        for result in rdr.records() {
-            let record = result?;
-            if let Ok(k) = record.get(0).unwrap_or("0").parse::<u32>() {
-                if k > max_req_key {
-                    max_req_key = k;
-                }
-            }
-        }
-    }
-
-    // === 2) New req_key ===
-    let new_req_key = max_req_key + 1;
-
-    // === 3) Append new record ===
-    let file = OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(&filename)?;
-
-    let mut wtr = WriterBuilder::new()
-        .has_headers(false)
-        .from_writer(file);
-
-    wtr.write_record(&[
-        new_req_key.to_string(),
-        id.to_string(),
-        "delete".to_string(),
-        tag_name,
-        "".to_string(),
-        "1".to_string(),
-    ])?;
-
-    wtr.flush()?;
-
-    Ok(1)
+    // Insert entry
+    let delete_tag_query = format!("INSERT INTO tagrequests (req_key, img_id, operation, old_tag)
+    VALUES ({req_key},{img_id},'delete','{tag_name}')"); // FIXME: make it safer (from sql injection)
+    let _delete_tag_statement = conn.execute(delete_tag_query)?;
+    
+    Ok(1) // TODO: handle errors
 }
-// ---
 
 pub fn get_username_from_session(token: String) -> String {
     let filename = env::var("SESSION_DB_FILENAME").unwrap(); // TODO: replace unwrap
