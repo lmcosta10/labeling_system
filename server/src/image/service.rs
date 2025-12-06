@@ -26,12 +26,12 @@ pub async fn get_gallery(token: String) -> Vec<Image> {
     let is_admin = get_is_admin_from_username(username.clone());
 
     if is_admin {
-        get_all_images().unwrap()
+        get_all_images().unwrap() // TODO: replace unwrap
     }
     else {
         let group = get_group_from_username(username.clone());
 
-        get_all_images_by_group(group).unwrap()
+        get_all_images_by_group(group).unwrap() // TODO: replace unwrap
     }
 }
 

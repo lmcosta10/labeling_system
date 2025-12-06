@@ -1,6 +1,4 @@
-use std::fs::{File, OpenOptions};
-use std::env;
-use csv::{ReaderBuilder, WriterBuilder};
+use sqlite;
 use crate::image::model::Image;
 
 #[derive(serde::Serialize)]
@@ -10,98 +8,92 @@ pub struct TagList {
 }
 
 pub fn get_all_images() -> Result<Vec<Image>, anyhow::Error> {
-    let filename = env::var("IMAGE_DB_FILENAME").unwrap(); // TODO: replace unwrap
+    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
 
-    let file = File::open(&filename)?;
-    let mut rdr = csv::ReaderBuilder::new()
-        .has_headers(true)
-        .from_reader(file);
+    let all_images_query = "SELECT * FROM images LIMIT 5";
+    let mut all_images_statement = conn.prepare(all_images_query)?;
 
     let mut found_images: Vec<Image> = Vec::new();
+    
+    while let sqlite::State::Row = all_images_statement.next()? {
+        let img_id_i64: i64 = all_images_statement.read(0)?;
+        let img_id = img_id_i64 as u32;
+        let img_url: String = all_images_statement.read(1)?;
 
-    for result in rdr.records() {
-        let record = result?;
-
-        let img_id = record[0].parse::<u32>().unwrap();
-        
         found_images.push(
             Image{
                 id: img_id,
-                url: record[1].to_string(),
+                url: img_url,
             }
         );
     }
+
     Ok(found_images)
 }
 
-pub fn get_all_images_by_group(group: i32) -> Result<Vec<Image>, anyhow::Error> {
+pub fn get_all_images_by_group(group: u32) -> Result<Vec<Image>, anyhow::Error> {
     let img_ids = get_all_images_ids_by_group(group);
 
-    let filename = env::var("IMAGE_DB_FILENAME").unwrap(); // TODO: replace unwrap
+    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
 
-    let file = File::open(&filename).unwrap();
-    let mut rdr = csv::Reader::from_reader(file);
+    let all_images_query = "SELECT * FROM images";
+    let mut all_images_statement = conn.prepare(all_images_query)?;
 
     let mut found_images: Vec<Image> = Vec::new();
+    
+    while let sqlite::State::Row = all_images_statement.next()? {
+        let img_id_i64: i64 = all_images_statement.read(0)?;
+        let img_id = img_id_i64 as u32;
+        let img_url: String = all_images_statement.read(1)?;
 
-    for result in rdr.records() {
-        let record = result.unwrap();
-
-        let img_id = record[0].parse::<u32>().unwrap();
-        
         if img_ids.contains(&img_id) {
             found_images.push(
                 Image{
                     id: img_id,
-                    url: record[1].to_string(),
+                    url: img_url,
                 }
             );
         }
     }
+
     Ok(found_images)
 }
 
-pub fn get_all_images_ids_by_group(group: i32) -> Vec<u32> {
-    let filename = env::var("IMGGROUP_DB_FILENAME").unwrap(); // TODO: replace unwrap
+pub fn get_all_images_ids_by_group(group: u32) -> Vec<u32> {
+    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    // TODO: replace unwrap
 
-    let file = File::open(&filename).unwrap();
-    let mut rdr = csv::Reader::from_reader(file);
+    let images_query = format!("SELECT * FROM image_groups WHERE \"group\" = {}", group); // group is a reserved word
+    let mut images_statement = conn.prepare(images_query).unwrap(); // TODO: replace unwrap
 
     let mut found_images_ids: Vec<u32> = Vec::new();
-
-    for result in rdr.records() {
-        let record = result.unwrap();
-
-        let img_group = record[1].parse::<i32>().unwrap();
-        
-        if img_group == group {
-            found_images_ids.push(record[0].parse::<u32>().unwrap())
-        }
+    
+    while let sqlite::State::Row = images_statement.next().unwrap() { // TODO: replace unwrap
+        let id_i64: i64 = images_statement.read(0).unwrap(); // TODO: replace unwrap
+        let id = id_i64 as u32;
+        found_images_ids.push(id);
     }
+
     found_images_ids
 }
 
 pub fn get_image_tags(id: u32) -> Result<TagList, anyhow::Error> {
-    let filename = env::var("TAGS_DB_FILENAME").unwrap(); // TODO: replace unwrap
+    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
 
-    let file = File::open(&filename)?;
-    let mut rdr = csv::Reader::from_reader(file);
+    let all_tags_query = format!("SELECT * FROM tags WHERE img_id = {}", id);
+    let mut all_tags_statement = conn.prepare(all_tags_query)?;
 
-    let mut found_tags_names: Vec<String> = Vec::new();
+    let mut found_tags: Vec<String> = Vec::new();
+    
+    while let sqlite::State::Row = all_tags_statement.next()? {
+        let tag: String = all_tags_statement.read(1)?;
 
-    for result in rdr.records() {
-        let record = result?;
-
-        let record_id = record[0].parse::<u32>().unwrap();
-
-        if record_id == id {
-            found_tags_names.push(record[1].to_string());
-        }
+        found_tags.push(tag);
     }
-    // TODO: handle error
+
     Ok(TagList {
         img_id: id,
-        tags_names: found_tags_names
+        tags_names: found_tags
     })
 }
 
@@ -110,14 +102,14 @@ pub fn set_new_tag_request(img_id: u32, tag_name: String) -> Result<u8, anyhow::
 
     // First, get neccessary info:
     // - highest req_key (currently, new key is equal to the highest existing key + 1)
-    let highest_key_query = format!("SELECT MAX(req_key) FROM tagrequests");
+    let highest_key_query = format!("SELECT MAX(req_key) FROM tag_requests");
     let mut highest_key_statement = conn.prepare(highest_key_query)?;
     let _ = highest_key_statement.next()?;
     let mut req_key: i64 = highest_key_statement.read(0)?;
     req_key = req_key + 1;
 
     // Insert entry
-    let new_tag_query = format!("INSERT INTO tagrequests (req_key, img_id, operation, new_tag)
+    let new_tag_query = format!("INSERT INTO tag_requests (req_key, img_id, operation, new_tag)
     VALUES ({req_key},{img_id},'add','{tag_name}')"); // FIXME: make it safer (from sql injection)
     let _new_tag_statement = conn.execute(new_tag_query)?;
     
@@ -129,14 +121,14 @@ pub fn set_edit_tag_request(img_id: u32, tag_name: String, new_name: String) -> 
 
     // First, get neccessary info:
     // - highest req_key (currently, new key is equal to the highest existing key + 1)
-    let highest_key_query = format!("SELECT MAX(req_key) FROM tagrequests");
+    let highest_key_query = format!("SELECT MAX(req_key) FROM tag_requests");
     let mut highest_key_statement = conn.prepare(highest_key_query)?;
     let _ = highest_key_statement.next()?;
     let mut req_key: i64 = highest_key_statement.read(0)?;
     req_key = req_key + 1;
 
     // Insert entry
-    let new_edit_tag_query = format!("INSERT INTO tagrequests (req_key, img_id, operation, old_tag, new_tag)
+    let new_edit_tag_query = format!("INSERT INTO tag_requests (req_key, img_id, operation, old_tag, new_tag)
     VALUES ({req_key},{img_id},'edit','{tag_name}', '{new_name}')"); // FIXME: make it safer (from sql injection)
     let _new_edit_tag_statement = conn.execute(new_edit_tag_query)?;
     
@@ -148,14 +140,14 @@ pub fn set_delete_tag_request(img_id: u32, tag_name: String) -> Result<u8, anyho
 
     // First, get neccessary info:
     // - highest req_key (currently, new key is equal to the highest existing key + 1)
-    let highest_key_query = format!("SELECT MAX(req_key) FROM tagrequests");
+    let highest_key_query = format!("SELECT MAX(req_key) FROM tag_requests");
     let mut highest_key_statement = conn.prepare(highest_key_query)?;
     let _ = highest_key_statement.next()?;
     let mut req_key: i64 = highest_key_statement.read(0)?;
     req_key = req_key + 1;
 
     // Insert entry
-    let delete_tag_query = format!("INSERT INTO tagrequests (req_key, img_id, operation, old_tag)
+    let delete_tag_query = format!("INSERT INTO tag_requests (req_key, img_id, operation, old_tag)
     VALUES ({req_key},{img_id},'delete','{tag_name}')"); // FIXME: make it safer (from sql injection)
     let _delete_tag_statement = conn.execute(delete_tag_query)?;
     
@@ -163,71 +155,64 @@ pub fn set_delete_tag_request(img_id: u32, tag_name: String) -> Result<u8, anyho
 }
 
 pub fn get_username_from_session(token: String) -> String {
-    let filename = env::var("SESSION_DB_FILENAME").unwrap(); // TODO: replace unwrap
+    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    // TODO: replace unwrap
 
-    let file = File::open(&filename).unwrap();
-    let mut rdr = csv::Reader::from_reader(file);
+    let username_query = format!("SELECT * FROM sessions WHERE token = '{}'", token); // FIXME: make it safer (from sql injection)
+    let mut username_statement = conn.prepare(username_query).unwrap(); // TODO: replace unwrap
 
     let mut username = String::new();
-
-    for result in rdr.records() {
-        let record = result.unwrap();
-
-        if record[1].to_string() == token {
-            username = record[0].to_string();
-        }
+    
+    while let sqlite::State::Row = username_statement.next().unwrap() { // TODO: replace unwrap
+        username = username_statement.read(0).unwrap(); // TODO: replace unwrap
     }
     username
 }
 
-pub fn get_group_from_username(username: String) -> i32 {
-    let filename = env::var("USERGROUP_DB_FILENAME").unwrap(); // TODO: replace unwrap
+pub fn get_group_from_username(username: String) -> u32 {
+    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    // TODO: replace unwrap
 
-    let file = File::open(&filename).unwrap();
-    let mut rdr = csv::Reader::from_reader(file);
+    let group_query = format!("SELECT * FROM user_groups WHERE username = '{}'", username); // FIXME: make it safer (from sql injection)
+    let mut group_statement = conn.prepare(group_query).unwrap(); // TODO: replace unwrap
 
-    let mut group = -1; // -1 for when the user is not in any group
-
-    for result in rdr.records() {
-        let record = result.unwrap();
-
-        if record[0].to_string() == username {
-            group = record[1].parse::<i32>().unwrap();
-        }
+    let mut group = 0; // 0 for when the user is not in any group
+    
+    while let sqlite::State::Row = group_statement.next().unwrap() { // TODO: replace unwrap
+        let group_i64: i64 = group_statement.read(1).unwrap(); // TODO: replace unwrap
+        group = group_i64 as u32;
     }
     group
 }
 
 pub fn get_is_admin_from_username(username: String) -> bool {
-    let filename = env::var("USER_DB_FILENAME").unwrap(); // TODO: replace unwrap
+    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    // TODO: replace unwrap
 
-    let file = File::open(&filename).unwrap();
-    let mut rdr = csv::Reader::from_reader(file);
+    let user_query = format!("SELECT * FROM users WHERE username = '{}'", username); // FIXME: make it safer (from sql injection)
+    let mut user_statement = conn.prepare(user_query).unwrap(); // TODO: replace unwrap
 
     let mut is_admin = false;
-
-    for result in rdr.records() {
-        let record = result.unwrap();
-
-        if record[0].to_string() == username {
-            is_admin = record[2].parse::<u32>().unwrap() > 0;
-        }
+    
+    while let sqlite::State::Row = user_statement.next().unwrap() { // TODO: replace unwrap
+        let is_admin_u64: i64 = user_statement.read(2).unwrap(); // TODO: replace unwrap
+        is_admin = is_admin_u64 == 1
     }
+
     is_admin
 }
 
-pub fn get_image_from_id(id: u32) -> Image {
-    let filename = env::var("IMAGE_DB_FILENAME").unwrap(); // TODO: replace unwrap
+pub fn get_image_from_id(id: u32, conn: &sqlite::Connection) -> Image {
+    let all_images_query = format!("SELECT * FROM images WHERE id = {}", id);
+    let mut all_images_statement = conn.prepare(all_images_query).unwrap(); // TODO: replace unwrap
+    
+    while let sqlite::State::Row = all_images_statement.next().unwrap() { // TODO: replace unwrap
+        let img_id_i64: i64 = all_images_statement.read(0).unwrap(); // TODO: replace unwrap
+        let img_id = img_id_i64 as u32;
+        let img_url: String = all_images_statement.read(1).unwrap(); // TODO: replace unwrap
 
-    let file = File::open(&filename).unwrap();
-    let mut rdr = csv::Reader::from_reader(file);
-
-    for result in rdr.records() {
-        let record = result.unwrap();
-
-        if record[0].parse::<u32>().unwrap() == id {
-            return Image { id: id, url: record[1].to_string() };
-        }
+        return Image{ id: img_id, url: img_url }
     }
+
     Image { id: 0, url: "".to_string() } // TODO: handle error
 }
