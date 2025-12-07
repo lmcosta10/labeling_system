@@ -31,9 +31,7 @@ pub fn get_all_images() -> Result<Vec<Image>, anyhow::Error> {
     Ok(found_images)
 }
 
-pub fn get_all_images_by_group(group: u32) -> Result<Vec<Image>, anyhow::Error> {
-    let img_ids = get_all_images_ids_by_group(group);
-
+pub fn get_all_images_by_ids(img_ids: Vec<u32>) -> Result<Vec<Image>, anyhow::Error> {
     let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
 
     let all_images_query = "SELECT * FROM images";
@@ -110,7 +108,7 @@ pub fn set_new_tag_request(img_id: u32, tag_name: String) -> Result<u8, anyhow::
 
     // Insert entry
     let new_tag_query = format!("INSERT INTO tag_requests (req_key, img_id, operation, new_tag)
-    VALUES ({req_key},{img_id},'add','{tag_name}')"); // FIXME: make it safer (from sql injection)
+    VALUES ({req_key},{img_id},'add','{tag_name}')"); // TODO: make it safer (from sql injection)
     let _new_tag_statement = conn.execute(new_tag_query)?;
     
     Ok(1) // TODO: handle errors
@@ -129,7 +127,7 @@ pub fn set_edit_tag_request(img_id: u32, tag_name: String, new_name: String) -> 
 
     // Insert entry
     let new_edit_tag_query = format!("INSERT INTO tag_requests (req_key, img_id, operation, old_tag, new_tag)
-    VALUES ({req_key},{img_id},'edit','{tag_name}', '{new_name}')"); // FIXME: make it safer (from sql injection)
+    VALUES ({req_key},{img_id},'edit','{tag_name}', '{new_name}')"); // TODO: make it safer (from sql injection)
     let _new_edit_tag_statement = conn.execute(new_edit_tag_query)?;
     
     Ok(1) // TODO: handle errors
@@ -148,7 +146,7 @@ pub fn set_delete_tag_request(img_id: u32, tag_name: String) -> Result<u8, anyho
 
     // Insert entry
     let delete_tag_query = format!("INSERT INTO tag_requests (req_key, img_id, operation, old_tag)
-    VALUES ({req_key},{img_id},'delete','{tag_name}')"); // FIXME: make it safer (from sql injection)
+    VALUES ({req_key},{img_id},'delete','{tag_name}')"); // TODO: make it safer (from sql injection)
     let _delete_tag_statement = conn.execute(delete_tag_query)?;
     
     Ok(1) // TODO: handle errors
@@ -158,7 +156,7 @@ pub fn get_username_from_session(token: String) -> String {
     let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
-    let username_query = format!("SELECT * FROM sessions WHERE token = '{}'", token); // FIXME: make it safer (from sql injection)
+    let username_query = format!("SELECT * FROM sessions WHERE token = '{}'", token); // TODO: make it safer (from sql injection)
     let mut username_statement = conn.prepare(username_query).unwrap(); // TODO: replace unwrap
 
     let mut username = String::new();
@@ -173,7 +171,7 @@ pub fn get_group_from_username(username: String) -> u32 {
     let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
-    let group_query = format!("SELECT * FROM user_groups WHERE username = '{}'", username); // FIXME: make it safer (from sql injection)
+    let group_query = format!("SELECT * FROM user_groups WHERE username = '{}'", username); // TODO: make it safer (from sql injection)
     let mut group_statement = conn.prepare(group_query).unwrap(); // TODO: replace unwrap
 
     let mut group = 0; // 0 for when the user is not in any group
@@ -189,7 +187,7 @@ pub fn get_is_admin_from_username(username: String) -> bool {
     let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
-    let user_query = format!("SELECT * FROM users WHERE username = '{}'", username); // FIXME: make it safer (from sql injection)
+    let user_query = format!("SELECT * FROM users WHERE username = '{}'", username); // TODO: make it safer (from sql injection)
     let mut user_statement = conn.prepare(user_query).unwrap(); // TODO: replace unwrap
 
     let mut is_admin = false;
@@ -200,19 +198,4 @@ pub fn get_is_admin_from_username(username: String) -> bool {
     }
 
     is_admin
-}
-
-pub fn get_image_from_id(id: u32, conn: &sqlite::Connection) -> Image {
-    let all_images_query = format!("SELECT * FROM images WHERE id = {}", id);
-    let mut all_images_statement = conn.prepare(all_images_query).unwrap(); // TODO: replace unwrap
-    
-    while let sqlite::State::Row = all_images_statement.next().unwrap() { // TODO: replace unwrap
-        let img_id_i64: i64 = all_images_statement.read(0).unwrap(); // TODO: replace unwrap
-        let img_id = img_id_i64 as u32;
-        let img_url: String = all_images_statement.read(1).unwrap(); // TODO: replace unwrap
-
-        return Image{ id: img_id, url: img_url }
-    }
-
-    Image { id: 0, url: "".to_string() } // TODO: handle error
 }

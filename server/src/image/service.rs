@@ -1,9 +1,6 @@
 use serde::Serialize;
 use crate::image::repository::{
-    get_all_images, get_all_images_by_group, get_group_from_username,
-    get_image_tags, get_username_from_session, set_new_tag_request,
-    set_edit_tag_request,set_delete_tag_request,
-    get_is_admin_from_username};
+    get_all_images, get_all_images_by_ids, get_all_images_ids_by_group, get_group_from_username, get_image_tags, get_is_admin_from_username, get_username_from_session, set_delete_tag_request, set_edit_tag_request, set_new_tag_request};
 use crate::image::model::Image;
 use anyhow::Result;
 
@@ -31,7 +28,9 @@ pub async fn get_gallery(token: String) -> Vec<Image> {
     else {
         let group = get_group_from_username(username.clone());
 
-        get_all_images_by_group(group).unwrap() // TODO: replace unwrap
+        let img_ids = get_all_images_ids_by_group(group);
+
+        get_all_images_by_ids(img_ids).unwrap() // TODO: replace unwrap
     }
 }
 

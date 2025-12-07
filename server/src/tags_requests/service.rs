@@ -1,5 +1,5 @@
 use crate::image::repository::{get_username_from_session,
-    get_is_admin_from_username}; // TODO: organize - put these in /user
+    get_is_admin_from_username}; // FIXME: organize - put these in /user
 use crate::tags_requests::repository::{get_all_pending_tags, remove_tag_request, approve_tag_request, PendingTagResponse};
 
 pub async fn get_pending_approvals(token: String) -> Result<Vec<PendingTagResponse>, anyhow::Error> {

@@ -3,8 +3,6 @@ use sqlite;
 use serde::{Deserialize, Serialize};
 use anyhow::Result;
 
-use crate::image::{repository::get_image_from_id};
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PendingTagResponse {
     req_key: u32,
@@ -18,7 +16,7 @@ pub struct PendingTagResponse {
 pub fn get_all_pending_tags () -> Result<Vec<PendingTagResponse>, anyhow::Error> {
     let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
 
-    let all_tags_query = "SELECT * FROM tag_requests LIMIT 5";
+    let all_tags_query = "SELECT * FROM tag_requests LEFT JOIN images ON tag_requests.img_id = images.id LIMIT 5";
     let mut all_tags_statement = conn.prepare(all_tags_query)?;
 
     let mut found_requests: Vec<PendingTagResponse> = Vec::new();
@@ -26,13 +24,10 @@ pub fn get_all_pending_tags () -> Result<Vec<PendingTagResponse>, anyhow::Error>
     while let sqlite::State::Row = all_tags_statement.next()? {
         let req_key_i64: i64 = all_tags_statement.read(0)?;
         let req_key = req_key_i64 as u32;
-        let img_id_i64: i64 = all_tags_statement.read(1)?;
-        let img_id = img_id_i64 as u32;
         let operation: String = all_tags_statement.read(2)?;
         let old_tag_opt: Option<String> = all_tags_statement.read(3)?;
         let new_tag_opt: Option<String> = all_tags_statement.read(4)?;
-
-        let img_url = get_image_from_id(img_id, &conn).url;
+        let img_url = all_tags_statement.read(6)?;
 
         found_requests.push(
             PendingTagResponse{
