@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode, type MouseEventHandler } from "react";
+import "../styles/tags_approval_styles.css"
 
 // --- Types ---
 // by Gemini 2.5 Pro
@@ -46,22 +47,9 @@ interface XProps {
 /**
  * A custom Button component that mimics shadcn's variants.
  */
-const Button: React.FC<ButtonProps> = ({ onClick, className, variant = 'default', children }) => {
-  // Base styles for all buttons
-  const baseStyles =
-    "inline-flex items-center justify-center rounded-md text-sm font-medium px-3 py-1.5 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
-
-  // Variant-specific styles
-  const variantStyles = {
-    default: "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-900",
-    destructive: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-600",
-  };
-
-  // Apply the 'destructive' style if passed, otherwise use 'default'
-  const style = variantStyles[variant] || variantStyles.default;
-
+const Button: React.FC<ButtonProps> = ({ onClick, className, children }) => {
   return (
-    <button onClick={onClick} className={`${baseStyles} ${style} ${className || ''}`}>
+    <button onClick={onClick} className={`${className}`}>
       {children}
     </button>
   );
@@ -150,43 +138,39 @@ export default function TagsApprovalPage() {
     fetchPendingTags();
   }, []);
 
-  if (loading) return <p className="p-4">Loading...</p>;
-  if (error) return <p className="p-4 text-red-500">{error}</p>;
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
-  // by Gemini 2.5 Pro:
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-4">Pending Tags</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {tags.filter(tag => tag.pending).map((tag) => (
-            // Replaced <Card> with a <div>, adding bg-white and border for a card-like feel
-            <div
-                key={tag.req_key} // Using req_key for a stable key
-                className="shadow-md rounded-2xl bg-white border border-gray-200"
+    <div className="pending-wrapper">
+      <h1 className="pending-title">Pending Tags</h1>
+
+      <div className="pending-grid">
+        {tags.filter((tag) => tag.pending).map((tag) => (
+          <div key={tag.req_key} className="pending-card">
+            <div className="pending-card-content">
+              <p className="old-name">Old tag: {tag.old_name}</p>
+              <p className="pending-name">New tag: {tag.new_name}</p>
+
+              <img src={tag.img_url} className="pending-image" />
+
+              <div className="pending-actions">
+                <Button
+                  onClick={() => handleApprove(tag.req_key)}
+                  className="pending-btn-approve"
                 >
-                {/* Replaced <CardContent> with a <div> */}
-                <div className="p-4">
-                <p className="text-lg font-medium mb-2">{tag.new_name}</p>
-                <img src={tag.img_url} />
-                <div className="flex gap-2">
-                    {/* Now using our custom Button and Check components */}
-                    <Button
-                    onClick={() => handleApprove(tag.req_key)}
-                    className="flex items-center gap-1"
-                    >
-                    <Check className="w-4 h-4" /> Approve
-                    </Button>
-                    {/* Now using our custom Button and X components */}
-                    <Button
-                    onClick={() => handleReject(tag.req_key)}
-                    variant="destructive"
-                    className="flex items-center gap-1"
-                    >
-                    <X className="w-4 h-4" /> Reject
-                    </Button>
-                </div>
-                </div>
+                  <Check className="icon-small" /> Approve
+                </Button>
+
+                <Button
+                  onClick={() => handleReject(tag.req_key)}
+                  className="pending-btn-reject"
+                >
+                  <X className="icon-small" /> Reject
+                </Button>
+              </div>
             </div>
+          </div>
         ))}
       </div>
     </div>

@@ -1,0 +1,101 @@
+/* Container */
+.image-page-wrapper {
+  padding: 0rem;
+}
+
+/* Image container */
+.image-container {
+  margin: 1rem 0.5rem;;
+}
+
+.selected-img {
+  border-radius: 8px;
+  border: 2px solid #dddfe2;
+}
+
+/* Tags wrapper */
+.tags-wrapper {
+  margin: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Tag item */
+.tag-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 10px;
+}
+
+.tag-approved {
+  background-color: #e4e4e4;
+}
+
+.tag-pending {
+  background-color: #fef3c7;
+}
+
+/* Tag text (pending) */
+.tag-pending-text {
+  font-size: 0.75rem;
+  color: #b45309;
+  font-style: italic;
+}
+
+/* Input inside editing mode */
+.tag-edit-input {
+  border: 1px solid #d1d5db;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* Action buttons */
+.btn-delete {
+  color: #ff0000;
+  background-color: #ffa0a0;
+}
+.btn-delete:hover {
+  color: #ffafaf;
+  background-color: #d61717;
+}
+
+/* AI Suggestion */
+
+.ai-suggestion-wrapper {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btn-ai {
+  color: #ffffff;
+}
+
+.ai-box {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  border-radius: 0.375rem;
+}
+
+/* Add new tag */
+
+.add-tag-row {
+  margin: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.add-tag-input {
+  border: 1px solid #ffffff;
+  padding: 0.25rem 0.5rem;
+  border: 2px solid #b3b5b9;
+  border-radius: 0.375rem;
+}
+
+.add-tag-button {
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "../styles/image_page_styles.css"
 
 export type Image = {
   id: number;
@@ -39,10 +40,9 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
 
         if (data.success) {
           const names: string[] = data.tags_names;
-          const approvedFlags: number[] = data.tags_approved;
 
           // Combine both arrays into TagState[]
-          const combined = names.map((name, i) => ({
+          const combined = names.map((name) => ({
             name,
             approved: true, // TODO
           }));
@@ -158,64 +158,61 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
   };
 
   return (
-    <div className="p-4">
+    <div className="image-page-wrapper">
       <div>
         <button onClick={onImageClick}>Back</button>
       </div>
 
-      <div className="my-4">
-        <img src={selectedImage.url} width={200} />
+      <div className="image-container">
+        <img src={selectedImage.url} width={200} className="selected-img" />
       </div>
 
-      <div className="flex flex-wrap gap-3 mb-6">
+      <div className="tags-wrapper">
         {tags.length > 0 ? (
-            tags.map((tag, index) => (
-              <div
-                key={`${tag.name}-${index}`}
-                className={`flex items-center gap-2 px-3 py-1 rounded-full ${
-                  tag.approved ? "bg-gray-100" : "bg-yellow-100"
-                }`}
-              >
+          tags.map((tag, index) => (
+            <div
+              key={`${tag.name}-${index}`}
+              className={`tag-item ${
+                tag.approved ? "tag-approved" : "tag-pending"
+              }`}
+            >
               {editingTag === tag.name ? (
                 <>
                   <input
                     type="text"
                     value={editedValue}
                     onChange={(e) => setEditedValue(e.target.value)}
-                    className="border px-2 rounded"
+                    className="tag-edit-input"
                   />
-                  <button
-                    onClick={handleSaveEdit}
-                    className="text-green-600 hover:underline"
-                  >
+
+                  <button onClick={handleSaveEdit}>
                     Save
                   </button>
-                  <button
-                    onClick={handleCancelEdit}
-                    className="text-gray-500 hover:underline"
-                  >
+
+                  <button onClick={handleCancelEdit}>
                     Cancel
                   </button>
                 </>
               ) : (
                 <>
                   <span>{tag.name}</span>
+
                   {!tag.approved && (
-                    <span className="text-xs text-yellow-600 italic">
-                      (pending)
-                    </span>
+                    <span className="tag-pending-text">(pending)</span>
                   )}
+
                   {tag.approved && (
                     <>
                       <button
                         onClick={() => handleEditTag(tag.name)}
-                        className="text-blue-600 hover:underline"
+                        className="btn-edit"
                       >
                         Edit
                       </button>
+
                       <button
                         onClick={() => handleDeleteTag(tag.name)}
-                        className="text-red-600 hover:underline"
+                        className="btn-delete"
                       >
                         X
                       </button>
@@ -228,32 +225,26 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
         ) : (
           <p>No tags yet.</p>
         )}
-        <button
-          onClick={getAISuggestion}
-          className="text-gray-500 hover:underline"
-        >
+      </div>
+
+      <div className="ai-suggestion-wrapper">
+        <button onClick={getAISuggestion} className="btn-ai">
           Get AI Suggestion
         </button>
 
-        {aiSuggestion && (
-          <div className="mt-2 p-2 border border-gray-300 rounded bg-gray-50">
-            {aiSuggestion}
-          </div>
-        )}
+        {aiSuggestion && <p className="ai-box">{aiSuggestion}</p>}
       </div>
 
-      <div className="flex gap-2">
+      <div className="add-tag-row">
         <input
           type="text"
           placeholder="Add new tag..."
           value={newTag}
           onChange={(e) => setNewTag(e.target.value)}
-          className="border rounded px-2 py-1"
+          className="add-tag-input"
         />
-        <button
-          onClick={handleAddTag}
-          className="bg-blue-600 text-white px-3 py-1 rounded"
-        >
+
+        <button onClick={handleAddTag} className="add-tag-button">
           Add
         </button>
       </div>

@@ -1,0 +1,95 @@
+/* Page wrapper */
+.pending-wrapper {
+  padding: 1.5rem 1rem;
+}
+
+/* Title */
+.pending-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* GRID */
+.pending-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+/* CARD */
+.pending-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pending-card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* CARD CONTENT */
+.pending-card-content {
+  padding: 1rem;
+}
+
+/* Old tag name */
+.old-name {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+/* New tag name */
+.pending-name {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* Image */
+.pending-image {
+  width: 100%;
+  display: block;
+  object-fit: contain;
+  margin-bottom: 0.75rem;
+}
+
+/* ACTIONS ROW */
+.pending-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Icon size */
+.icon-small {
+  width: 16px;
+  height: 16px;
+}
+
+/* BUTTON OVERRIDES (for your custom Button component) */
+.pending-btn-approve {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: #129b6f;
+  color: white;
+}
+.pending-btn-approve:hover {
+  background-color: #046848;
+}
+
+.pending-btn-reject {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: #fc3e3e;
+  color: white;
+}
+.pending-btn-reject:hover {
+  background-color: #ce1515;
+}

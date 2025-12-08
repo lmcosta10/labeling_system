@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {type Image} from "./Image";
+import "../styles/gallery_styles.css"
 
 interface GalleryProps {
     onImageClick: (image: Image) => void;
@@ -33,15 +34,24 @@ export default function Gallery({ onImageClick }: GalleryProps) {
     }, []); // empty dependency array => run once on mount
 
     if (loading) return <p>Loading...</p>;
-
+    
+    // TODO: style here
     return (
-    <div>
-        <h2>Image Gallery</h2>
+    <div className="gallery-wrapper">
+        <h2 className="gallery-title">Image Gallery</h2>
+
+        <div className="gallery-grid">
         {images.map((img) => (
-        <div key={img.id} onClick={() => onImageClick(img)}>
-            <img src={img.url} width={200} />
-        </div>
+            <div
+            key={img.id}
+            className="gallery-item"
+            onClick={() => onImageClick(img)}
+            >
+            <img src={img.url} className="gallery-image" />
+            </div>
         ))}
+        </div>
     </div>
     );
+
 }

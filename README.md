@@ -39,7 +39,7 @@ Data flow of image uploading:
 
 Using Vite as build tool.
 
-ChatGPT handled the frontend style: it generated the html to be returned by each component. Also, it generated the handlers in Image.tsx, to send the appropriate request to the server from the user inputs.
+The frontend style was built using AI (ChatGPT): it generated the classes and css files, which were then customized.
 
 ### Backend
 

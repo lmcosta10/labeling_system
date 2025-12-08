@@ -3,6 +3,7 @@ import ImageDetails, { type Image } from "./components/Image";
 import Gallery from "./components/Gallery";
 import Login from "./components/Login";
 import TagsApprovalPage from "./components/TagsApproval";
+import "./styles/styles.css"
 
 const App: React.FC = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -47,7 +48,7 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <h1>Labeler System</h1>
+      <h1>Labeling System</h1>
 
       {!loggedIn ? (
         <Login onLoginSuccess={handleLoginSuccess} />
@@ -64,12 +65,14 @@ const App: React.FC = () => {
         </>
       ) : (
         <>
-          <p>Welcome User!</p>
+          <p>Welcome!</p>
           <Gallery onImageClick={handleImageClick} />
           {isAdmin && (
             <button onClick={goToAdminPanel}>Go to Admin Panel</button>
           )}
-          <button onClick={handleLogout}>Logout</button>
+          <div>
+            <button onClick={handleLogout}>Logout</button>
+          </div>
         </>
       )}
     </div>
