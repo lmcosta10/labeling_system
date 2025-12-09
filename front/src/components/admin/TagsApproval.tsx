@@ -1,8 +1,7 @@
-import { useEffect, useState, type ReactNode, type MouseEventHandler } from "react";
-import "../styles/tags_approval_styles.css"
+import { useEffect, useState } from "react";
+import "../../styles/tags_approval_styles.css"
 
 // --- Types ---
-// by Gemini 2.5 Pro
 
 /**
  * Defines the structure of a Tag object.
@@ -14,16 +13,6 @@ interface TagRequest {
   old_name: string;
   new_name: string;
   pending: boolean
-}
-
-/**
- * Defines the props for the Button component.
- */
-interface ButtonProps {
-  onClick: MouseEventHandler<HTMLButtonElement>;
-  className?: string; // Optional class names
-  variant?: 'default' | 'destructive';
-  children: ReactNode;
 }
 
 /**
@@ -43,17 +32,6 @@ interface XProps {
 
 // --- Custom Components ---
 // by Gemini 2.5 Pro
-
-/**
- * A custom Button component that mimics shadcn's variants.
- */
-const Button: React.FC<ButtonProps> = ({ onClick, className, children }) => {
-  return (
-    <button onClick={onClick} className={`${className}`}>
-      {children}
-    </button>
-  );
-};
 
 /**
  * A custom Check icon component using SVG.
@@ -111,7 +89,6 @@ export default function TagsApprovalPage() {
       );
       if (!response.ok) throw new Error("Failed to fetch tags");
       const data = await response.json();
-      console.log(data)
       setTags(data);
     } catch (e) {
       if (e instanceof Error) {
@@ -155,19 +132,19 @@ export default function TagsApprovalPage() {
               <img src={tag.img_url} className="pending-image" />
 
               <div className="pending-actions">
-                <Button
+                <button
                   onClick={() => handleApprove(tag.req_key)}
                   className="pending-btn-approve"
                 >
                   <Check className="icon-small" /> Approve
-                </Button>
+                </button>
 
-                <Button
+                <button
                   onClick={() => handleReject(tag.req_key)}
                   className="pending-btn-reject"
                 >
                   <X className="icon-small" /> Reject
-                </Button>
+                </button>
               </div>
             </div>
           </div>

@@ -92,7 +92,6 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
       if (!response.ok) throw new Error("Failed to get AI suggestion");
 
       const data = await response.json();
-      console.log(data.ai_response);
 
       if (!data.success) {
         console.warn("Server did not confirm success:", data);

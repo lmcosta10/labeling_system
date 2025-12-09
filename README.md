@@ -15,7 +15,7 @@ If you want to test the site, you can get the data from the databases in /server
 * alice belongs to group 1
 * bob is an admin
 * charlie does not belong to any group
-* Group 1 has two images (rust crab and Google logo)
+* Group 1 has 1 image (rust crab)
 
 ## Details
 

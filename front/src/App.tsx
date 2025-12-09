@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ImageDetails, { type Image } from "./components/Image";
 import Gallery from "./components/Gallery";
 import Login from "./components/Login";
-import TagsApprovalPage from "./components/TagsApproval";
+import AdminPage from "./components/admin/AdminPage";
 import "./styles/styles.css"
 
 const App: React.FC = () => {
@@ -55,7 +55,7 @@ const App: React.FC = () => {
       ) : view === "admin" && isAdmin ? (
         <>
           <button onClick={() => setView("gallery")}>Back</button>
-          <TagsApprovalPage />
+          <AdminPage />
           <button onClick={handleLogout}>Logout</button>
         </>
       ) : view === "details" && selectedImage ? (
