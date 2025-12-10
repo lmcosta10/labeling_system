@@ -1,0 +1,23 @@
+.group-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.group-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+}
+
+.group-card-content {
+    padding: 1rem;
+    text-align: center;
+    font-size: large;
+    font-weight: 800;
+}
+
+.username {
+    font-size: medium;
+    font-weight: 200;
+}

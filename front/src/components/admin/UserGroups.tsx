@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-// import "../../styles/user_groups_styles.css"
+import "../../styles/user_groups_styles.css"
 
 interface UserGroups {
-  username: string,
+  usernames: Array<string>,
   group: number
 }
 
@@ -28,7 +28,6 @@ export default function TagsApprovalPage() {
             );
             if (!response.ok) throw new Error("Failed to fetch user groups");
             const data = await response.json();
-            console.log(data)
             setUserGroups(data);
         } catch (e) {
             if (e instanceof Error) {
@@ -49,11 +48,15 @@ export default function TagsApprovalPage() {
     if (error) return <p>{error}</p>;
 
     return (
-        <div>
+        <div className="group-grid">
             {usergroups.map(usergroup => 
-            <div>
-                <p>{usergroup.username}</p>
-                <p>{usergroup.group}</p>
+            <div key={usergroup.group} className="group-card">
+                <div className="group-card-content">
+                Group {usergroup.group}
+                {usergroup.usernames.map(user =>
+                    <p key={user} className="username">{user}</p>
+                )}
+                </div>
             </div>)}
         </div>
     )
