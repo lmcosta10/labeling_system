@@ -47,9 +47,11 @@ export default function UserGroupsPage() {
 
     const addUser = async (group: number) => {
         try {
+            const userToken: string | null = localStorage.getItem('token');
+
             const response = await fetch(`${API_BASE}/api/usergroups/adduser`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${userToken}` },
                 body: JSON.stringify({
                     group,
                     user: newUser
@@ -67,9 +69,11 @@ export default function UserGroupsPage() {
 
     const removeUser = async (group: number, user: string) => {
         try {
+            const userToken: string | null = localStorage.getItem('token');
+
             const response = await fetch(`${API_BASE}/api/usergroups/removeuser`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${userToken}` },
                 body: JSON.stringify({
                     group,
                     user

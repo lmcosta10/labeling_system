@@ -31,8 +31,15 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
   useEffect(() => {
     async function fetchImageTags() {
       try {
+        const userToken: string | null = localStorage.getItem('token');
+        
         const imageUrl = `${imageUrlStart}/${selectedImage.id}`;
-        const response = await fetch(imageUrl);
+        const response = await fetch(imageUrl, {
+          method: 'GET',
+          headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`}
+        });
 
         if (!response.ok) throw new Error("Failed to fetch image");
 
@@ -63,9 +70,11 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
   // Send approved tag modification to server
   async function sendTagForApproval(action: "add" | "edit" | "delete", tagName: string, newName?: string) {
     try {
+      const userToken: string | null = localStorage.getItem('token');
+
       const response = await fetch(`${imageUrlStart}/${selectedImage.id}/tags`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${userToken}` },
         body: JSON.stringify({
           action,
           tag: tagName,
@@ -85,8 +94,12 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
   // Get AI suggestion
   async function getAISuggestion() {
     try {
+      const userToken: string | null = localStorage.getItem('token');
+
       const response = await fetch(`${imageUrlStart}/${selectedImage.id}/ai`, {
-        method: "GET"
+        method: "GET",
+        headers: {
+          'Authorization': `Bearer ${userToken}`}
       });
 
       if (!response.ok) throw new Error("Failed to get AI suggestion");
