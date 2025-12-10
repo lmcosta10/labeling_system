@@ -12,6 +12,7 @@ mod image;
 mod tags_requests;
 mod ai;
 mod user_groups;
+mod common;
 
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 2)]
@@ -35,6 +36,8 @@ async fn main() {
         .route("/api/tags/{name}/reject",post(crate::tags_requests::handler::handle_tag_rejection))
         .route("/api/image/{id}/ai",get(crate::ai::handler::handle_ai_suggestion_request))
         .route("/api/usergroups",get(crate::user_groups::handler::handle_user_groups_page))
+        .route("/api/usergroups/adduser",post(crate::user_groups::handler::handle_user_groups_addition))
+        .route("/api/usergroups/removeuser",post(crate::user_groups::handler::handle_user_groups_deletion))
         .layer(cors);
 
     let api_addr = env::var("API_ADDR").unwrap(); // TODO: replace unwrap
