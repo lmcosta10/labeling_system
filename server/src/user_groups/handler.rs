@@ -3,6 +3,7 @@ use axum::{Json, http::StatusCode};
 use crate::user_groups::repository::{UserGroupsResponse};
 use serde::Deserialize;
 use crate::common::server_utils;
+use crate::auth;
 
 use crate::user_groups::service;
 
@@ -27,7 +28,9 @@ pub async fn handle_user_groups_addition(
     headers: HeaderMap, Json(payload): Json<UserGroupPostInfo>
 ) -> Result<Json<u32>, (StatusCode, String)> {
     let token = server_utils::extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string()))?;
-    println!("{} for u.g.addition", token);
+    
+    let username = auth::repository::get_username_from_session(token);
+    let is_admin = auth::repository::get_is_admin_from_username(username);
 
     println!("{}", payload.group);
     println!("{}", payload.user);

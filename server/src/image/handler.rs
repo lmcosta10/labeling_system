@@ -20,8 +20,6 @@ pub async fn handle_image(
     let token = server_utils::extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string()))?;
     let is_user = server_utils::check_is_user(token);
 
-    println!("Is user? {}", is_user); // TODO: remove
-
     if is_user {
         match service::get_image_data(id).await {
             Ok(resp) => Ok(Json(resp)),
@@ -38,8 +36,6 @@ pub async fn handle_tag_post(
 ) -> Result<Json<service::TagResponse>, (StatusCode, String)> {
     let token = server_utils::extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string()))?;
     let is_user = server_utils::check_is_user(token);
-
-    println!("Is user? {}", is_user); // TODO: remove
 
     if is_user {
         match service::post_tag_user(img_id, payload.action, payload.tag_name, payload.new_name).await {

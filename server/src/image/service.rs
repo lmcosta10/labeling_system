@@ -1,8 +1,9 @@
 use serde::Serialize;
 use crate::image::repository::{
-    get_all_images, get_all_images_by_ids, get_all_images_ids_by_group, get_group_from_username, get_image_tags, get_is_admin_from_username, get_username_from_session, set_delete_tag_request, set_edit_tag_request, set_new_tag_request};
+    get_all_images, get_all_images_by_ids, get_all_images_ids_by_group, get_image_tags, set_delete_tag_request, set_edit_tag_request, set_new_tag_request};
 use crate::image::model::Image;
 use anyhow::Result;
+use crate::auth;
 
 #[derive(Serialize)]
 pub struct ImgResponse {
@@ -18,15 +19,15 @@ pub struct TagResponse {
 }
 
 pub async fn get_gallery(token: String) -> Vec<Image> {
-    let username = get_username_from_session(token);
+    let username = auth::repository::get_username_from_session(token);
 
-    let is_admin = get_is_admin_from_username(username.clone());
+    let is_admin = auth::repository::get_is_admin_from_username(username.clone());
 
     if is_admin {
         get_all_images().unwrap() // TODO: replace unwrap
     }
     else {
-        let group = get_group_from_username(username.clone());
+        let group = auth::repository::get_group_from_username(username.clone());
 
         let img_ids = get_all_images_ids_by_group(group);
 
