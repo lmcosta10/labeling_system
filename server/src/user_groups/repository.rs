@@ -79,3 +79,21 @@ pub fn get_is_admin_from_username(username: String) -> bool {
 
     is_admin
 }
+
+pub fn add_user_to_group(user: String, group: u32) {
+    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    // TODO: replace unwrap
+
+    let new_ug_query = format!("INSERT INTO user_groups (\"username\", \"group\")
+    VALUES ('{}','{}')", user, group); // TODO: make it safer (from sql injection)
+    let _new_ug_statement = conn.execute(new_ug_query).unwrap(); // TODO: replace unwrap
+}
+
+pub fn remove_user_from_group(user: String, group: u32) {
+    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    // TODO: replace unwrap
+
+    let deletion_query = format!("DELETE FROM user_groups
+    WHERE (\"username\" = '{}' AND \"group\" = '{}')", user, group); // TODO: make it safer (from sql injection)
+    let _deletion_statement = conn.execute(deletion_query).unwrap(); // TODO: replace unwrap
+}

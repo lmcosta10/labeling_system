@@ -22,6 +22,7 @@ pub async fn handle_tag_approval(
 ) -> Result<Json<bool>, (StatusCode, String)> {
     let token = server_utils::extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string()))?;
 
+    // TODO: reject token in handler, not service?
     match service::set_approved_tag(token, req_key).await {
         Ok(resp) => Ok(Json(resp)),
         Err(err) => Err((StatusCode::NO_CONTENT, err.to_string())),
@@ -33,6 +34,7 @@ pub async fn handle_tag_rejection(
 ) -> Result<Json<bool>, (StatusCode, String)> {
     let token = server_utils::extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string()))?;
 
+    // TODO: reject token in handler, not service?
     match service::set_rejected_tag(token, req_key).await {
         Ok(resp) => Ok(Json(resp)),
         Err(err) => Err((StatusCode::NO_CONTENT, err.to_string())),

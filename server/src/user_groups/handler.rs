@@ -32,18 +32,32 @@ pub async fn handle_user_groups_addition(
     let username = auth::repository::get_username_from_session(token);
     let is_admin = auth::repository::get_is_admin_from_username(username);
 
-    println!("{}", payload.group);
-    println!("{}", payload.user);
-    Ok(Json(1)) // TODO
+    if is_admin {
+        match service::set_user_addition_to_group(payload.user, payload.group).await {
+            Ok(resp) => Ok(Json(resp)),
+            Err(err) => Err((StatusCode::NO_CONTENT, err.to_string())),
+        }
+    }
+    else {
+        Err((StatusCode::UNAUTHORIZED, "Not an admin.".to_string()))
+    }
 }
 
 pub async fn handle_user_groups_deletion(
     headers: HeaderMap, Json(payload): Json<UserGroupPostInfo>
 ) -> Result<Json<u32>, (StatusCode, String)> {
     let token = server_utils::extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string()))?;
-    println!("{} for u.g.deletion", token);
+    
+    let username = auth::repository::get_username_from_session(token);
+    let is_admin = auth::repository::get_is_admin_from_username(username);
 
-    println!("{}", payload.group);
-    println!("{}", payload.user);
-    Ok(Json(1)) // TODO
+    if is_admin {
+        match service::set_user_deletion_from_group(payload.user, payload.group).await {
+            Ok(resp) => Ok(Json(resp)),
+            Err(err) => Err((StatusCode::NO_CONTENT, err.to_string())),
+        }
+    }
+    else {
+        Err((StatusCode::UNAUTHORIZED, "Not an admin.".to_string()))
+    }
 }
