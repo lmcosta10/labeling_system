@@ -61,7 +61,12 @@ export default function UserGroupsPage() {
             if (!response.ok) throw new Error("Failed to send user addition to group");
 
             const data = await response.json();
-            if (!data.success) console.warn("Server did not confirm success: ", data);
+            if (data.success) {
+                fetchUserGroups();
+            }
+            else {
+                console.warn("Server did not confirm success: ", data);
+            }
         } catch (err) {
                 console.error("Error sending user addition to group: ", err);
         }
@@ -83,7 +88,12 @@ export default function UserGroupsPage() {
             if (!response.ok) throw new Error("Failed to send user deletion from group");
 
             const data = await response.json();
-            if (!data.success) console.warn("Server did not confirm success: ", data);
+            if (data.success) {
+                fetchUserGroups();
+            }
+            else {
+                console.warn("Server did not confirm success: ", data);
+            }
         } catch (err) {
                 console.error("Error sending user deletion from group: ", err);
         }
