@@ -30,3 +30,8 @@
 .removeu-btn:hover {
     background-color: rgb(177, 22, 22);
 }
+
+.addg-button {
+    width: 10rem;
+    height: 2rem;
+}

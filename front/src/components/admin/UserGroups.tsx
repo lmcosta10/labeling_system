@@ -68,7 +68,7 @@ export default function UserGroupsPage() {
                 console.warn("Server did not confirm success: ", data);
             }
         } catch (err) {
-                console.error("Error sending user addition to group: ", err);
+                console.error("Error sending group creation: ", err);
         }
     };
 
@@ -99,6 +99,29 @@ export default function UserGroupsPage() {
         }
     };
 
+    const addGroup = async () => {
+        try {
+            const userToken: string | null = localStorage.getItem('token');
+
+            const response = await fetch(`${API_BASE}/api/addgroup`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${userToken}` },
+            });
+
+            if (!response.ok) throw new Error("Failed to create group");
+
+            const data = await response.json();
+            if (data.success) {
+                fetchUserGroups();
+            }
+            else {
+                console.warn("Server did not confirm success: ", data);
+            }
+        } catch (err) {
+                console.error("Error sending group creation: ", err);
+        }
+    }
+
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
 
@@ -122,12 +145,15 @@ export default function UserGroupsPage() {
                             className="addu-input"
                             />
 
-                            <button onClick={() => addUser(usergroup.group)} className="addu-button">
+                            <button onClick={() => addUser(usergroup.group)}>
                             Add
                             </button>
                     </div>
                 </div>
             </div>)}
+            <button onClick={() => addGroup()} className="addg-button">
+                Add group
+            </button>
         </div>
     )
 }
