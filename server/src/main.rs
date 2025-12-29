@@ -38,6 +38,7 @@ async fn main() {
         .route("/api/usergroups",get(crate::user_groups::handler::handle_user_groups_page))
         .route("/api/usergroups/adduser",post(crate::user_groups::handler::handle_user_groups_addition))
         .route("/api/usergroups/removeuser",post(crate::user_groups::handler::handle_user_groups_deletion))
+        .route("/api/addgroup",post(crate::user_groups::handler::handle_group_creation))
         .layer(cors);
 
     let api_addr = env::var("API_ADDR").unwrap(); // TODO: replace unwrap

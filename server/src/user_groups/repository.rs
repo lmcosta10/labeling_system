@@ -9,7 +9,9 @@ pub struct UserGroupsResponse {
 pub fn get_all_user_groups() -> Result<Vec<UserGroupsResponse>, anyhow::Error> {
     let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
 
-    let user_groups_query = "SELECT * FROM user_groups ORDER BY \"group\""; // "ORDER BY": TODO: optimize code later
+    // Get ALL user groups (in "groups" table), even if they don't have any users
+    let user_groups_query = "SELECT * FROM \"groups\" LEFT JOIN user_groups
+    ON \"groups\".\"group\" = user_groups.\"group\" ORDER BY \"group\""; // "ORDER BY": TODO: optimize code later
     let mut user_groups_statement = conn.prepare(user_groups_query)?;
 
     let mut all_groups: Vec<u32> = Vec::new();
@@ -17,8 +19,8 @@ pub fn get_all_user_groups() -> Result<Vec<UserGroupsResponse>, anyhow::Error> {
     let mut found_user_groups: Vec<UserGroupsResponse> = Vec::new();
     
     while let sqlite::State::Row = user_groups_statement.next()? {
-        let username: String = user_groups_statement.read(0)?;
-        let group_i64: i64 = user_groups_statement.read(1)?;
+        let username: String = user_groups_statement.read(1).unwrap_or_default(); // TODO: replace unwrap_or_default?
+        let group_i64: i64 = user_groups_statement.read(0)?;
         let group = group_i64 as u32;
 
         // If it's the first user found in a group:
@@ -96,4 +98,12 @@ pub fn remove_user_from_group(user: String, group: u32) {
     let deletion_query = format!("DELETE FROM user_groups
     WHERE (\"username\" = '{}' AND \"group\" = '{}')", user, group); // TODO: make it safer (from sql injection)
     let _deletion_statement = conn.execute(deletion_query).unwrap(); // TODO: replace unwrap
+}
+
+pub fn add_group() {
+    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    // TODO: replace unwrap
+
+    let new_group_query = format!("INSERT INTO \"groups\" (\"group\") VALUES (NULL)"); // TODO: make it safer (from sql injection)
+    let _new_group_statement = conn.execute(new_group_query).unwrap(); // TODO: replace unwrap
 }

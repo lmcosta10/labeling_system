@@ -18,6 +18,11 @@ pub struct UserGroupChangeResponse {
     success: bool
 }
 
+#[derive(Serialize)]
+pub struct GroupCreationResponse {
+    success: bool
+}
+
 pub async fn handle_user_groups_page(
     headers: HeaderMap
 ) -> Result<Json<Vec<UserGroupsResponse>>, (StatusCode, String)> {
@@ -59,6 +64,25 @@ pub async fn handle_user_groups_deletion(
     if is_admin {
         match service::set_user_deletion_from_group(payload.user, payload.group).await {
             Ok(_resp) => Ok(Json(UserGroupChangeResponse { success: true })),
+            Err(err) => Err((StatusCode::NO_CONTENT, err.to_string())),
+        }
+    }
+    else {
+        Err((StatusCode::UNAUTHORIZED, "Not an admin.".to_string()))
+    }
+}
+
+pub async fn handle_group_creation(
+    headers: HeaderMap
+) -> Result<Json<GroupCreationResponse>, (StatusCode, String)> {
+    let token = server_utils::extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string()))?;
+    
+    let username = auth::repository::get_username_from_session(token);
+    let is_admin = auth::repository::get_is_admin_from_username(username);
+
+    if is_admin {
+        match service::set_group_creation().await {
+            Ok(_resp) => Ok(Json(GroupCreationResponse { success: true })),
             Err(err) => Err((StatusCode::NO_CONTENT, err.to_string())),
         }
     }
