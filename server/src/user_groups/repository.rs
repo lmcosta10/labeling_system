@@ -6,6 +6,11 @@ pub struct UserGroupsResponse {
     usernames: Vec<String>
 }
 
+#[derive(Serialize)]
+pub struct SuccessResponse {
+    pub success: bool
+}
+
 pub fn get_all_user_groups() -> Result<Vec<UserGroupsResponse>, anyhow::Error> {
     let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
 
@@ -106,4 +111,16 @@ pub fn add_group() {
 
     let new_group_query = format!("INSERT INTO \"groups\" (\"group\") VALUES (NULL)"); // TODO: make it safer (from sql injection)
     let _new_group_statement = conn.execute(new_group_query).unwrap(); // TODO: replace unwrap
+}
+
+pub fn delete_group(group: u32) {
+    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    // TODO: replace unwrap
+
+    let delete_group_query = format!("DELETE FROM \"groups\"
+    WHERE (\"group\" = {})", group); // TODO: make it safer (from sql injection)
+    let _delete_group_statement = conn.execute(delete_group_query).unwrap(); // TODO: replace unwrap
+
+    // FIXME: update database after group deletion
+    // TODO?: groups by name, not number
 }
