@@ -1,6 +1,7 @@
 use crate::auth::repository::{get_username_from_session,
     get_is_admin_from_username};
-use crate::tags_requests::repository::{get_all_pending_tags, remove_tag_request, approve_tag_request, PendingTagResponse};
+use crate::tags_requests::repository::{get_all_pending_tags, remove_tag_request, approve_tag_request};
+use crate::tags_requests::model::PendingTagResponse;
 
 pub async fn get_pending_approvals(token: String) -> Result<Vec<PendingTagResponse>, anyhow::Error> {
     let username = get_username_from_session(token);

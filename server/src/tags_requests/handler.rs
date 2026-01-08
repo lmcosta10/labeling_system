@@ -1,7 +1,7 @@
 use axum::extract::Path;
 use axum::http::HeaderMap;
 use axum::{Json, http::StatusCode};
-use crate::tags_requests::repository::PendingTagResponse;
+use crate::tags_requests::model::PendingTagResponse;
 use crate::common::server_utils;
 
 use crate::tags_requests::service;

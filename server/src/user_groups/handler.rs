@@ -1,18 +1,11 @@
 use axum::extract::Path;
 use axum::http::HeaderMap;
 use axum::{Json, http::StatusCode};
-use crate::user_groups::repository::{UserGroupsResponse, SuccessResponse};
-use serde::{Deserialize};
+use crate::user_groups::model::{UserGroupsResponse, SuccessResponse, UserGroupPostInfo};
 use crate::common::server_utils;
 use crate::auth;
 
 use crate::user_groups::service;
-
-#[derive(Deserialize)]
-pub struct UserGroupPostInfo {
-    group: u32,
-    user: String
-}
 
 pub async fn handle_user_groups_page(
     headers: HeaderMap

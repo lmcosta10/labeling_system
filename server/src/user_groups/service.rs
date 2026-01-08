@@ -1,5 +1,5 @@
-use crate::user_groups::repository::{UserGroupsResponse, get_all_user_groups};
-use crate::user_groups::repository::{get_username_from_session, get_is_admin_from_username,
+use crate::user_groups::model::{UserGroupsResponse};
+use crate::user_groups::repository::{get_all_user_groups, get_username_from_session, get_is_admin_from_username,
     add_user_to_group, remove_user_from_group, add_group, delete_group}; // TODO: remove duplicate functions from image crate
 
 pub async fn get_user_groups_page(token: String) -> Result<Vec<UserGroupsResponse>, anyhow::Error> {

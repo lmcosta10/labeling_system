@@ -1,22 +1,8 @@
-use serde::Serialize;
 use crate::image::repository::{
     get_all_images, get_all_images_by_ids, get_all_images_ids_by_group, get_image_tags, set_delete_tag_request, set_edit_tag_request, set_new_tag_request};
-use crate::image::model::Image;
+use crate::image::model::{Image, ImgResponse, TagResponse};
 use anyhow::Result;
 use crate::auth;
-
-#[derive(Serialize)]
-pub struct ImgResponse {
-    pub success: bool,
-    pub message: String,
-    pub tags_names: Vec<String>
-}
-
-#[derive(Serialize)]
-pub struct TagResponse {
-    pub success: bool,
-    pub message: String
-}
 
 pub async fn get_gallery(token: String) -> Vec<Image> {
     let username = auth::repository::get_username_from_session(token);

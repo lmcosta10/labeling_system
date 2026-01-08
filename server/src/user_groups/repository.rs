@@ -1,15 +1,4 @@
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct UserGroupsResponse {
-    group: u32,
-    usernames: Vec<String>
-}
-
-#[derive(Serialize)]
-pub struct SuccessResponse {
-    pub success: bool
-}
+use crate::user_groups::model::UserGroupsResponse;
 
 pub fn get_all_user_groups() -> Result<Vec<UserGroupsResponse>, anyhow::Error> {
     let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly

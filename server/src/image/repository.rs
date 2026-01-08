@@ -1,11 +1,5 @@
 use sqlite;
-use crate::image::model::Image;
-
-#[derive(serde::Serialize)]
-pub struct TagList {
-    pub img_id: u32,
-    pub tags_names: Vec<String>
-}
+use crate::image::model::{Image, TagList};
 
 pub fn get_all_images() -> Result<Vec<Image>, anyhow::Error> {
     let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly

@@ -1,5 +1,5 @@
 use axum::{Json, http::StatusCode, http::HeaderMap};
-use crate::ai::repository::AIResponse;
+use crate::ai::model::AIResponse;
 use crate::common::server_utils;
 
 use crate::ai::service;

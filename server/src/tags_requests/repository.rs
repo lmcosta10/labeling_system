@@ -1,17 +1,7 @@
 use anyhow;
 use sqlite;
-use serde::{Deserialize, Serialize};
 use anyhow::Result;
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct PendingTagResponse {
-    req_key: u32,
-    img_url: String,
-    operation: String,
-    old_name: String,
-    new_name: String,
-    pending: bool // TODO: remove (frontend)
-}
+use crate::tags_requests::model::PendingTagResponse;
 
 pub fn get_all_pending_tags () -> Result<Vec<PendingTagResponse>, anyhow::Error> {
     let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
