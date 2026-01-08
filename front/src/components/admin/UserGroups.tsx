@@ -122,6 +122,29 @@ export default function UserGroupsPage() {
         }
     }
 
+    const deleteGroup = async (group: number) => {
+        try {
+            const userToken: string | null = localStorage.getItem('token');
+
+            const response = await fetch(`${API_BASE}/api/deletegroup/${group}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${userToken}` },
+            });
+
+            if (!response.ok) throw new Error("Failed to delete group");
+
+            const data = await response.json();
+            if (data.success) {
+                fetchUserGroups();
+            }
+            else {
+                console.warn("Server did not confirm success: ", data);
+            }
+        } catch (err) {
+                console.error("Error sending group deletion: ", err);
+        }
+    }
+
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
 
@@ -130,11 +153,11 @@ export default function UserGroupsPage() {
             {usergroups.map(usergroup => 
             <div key={usergroup.group} className="group-card">
                 <div className="group-card-content">
-                    Group {usergroup.group}
+                    Group {usergroup.group} <button onClick={() => deleteGroup(usergroup.group)} className="remove-btn">Delete</button>
                     {usergroup.usernames.map(user =>
                         <div key={user} className="username">
                             {user}
-                            <button onClick={() => removeUser(usergroup.group, user)} className="removeu-btn">Remove</button>
+                            <button onClick={() => removeUser(usergroup.group, user)} className="remove-btn">Remove</button>
                         </div>
                     )}
                     <div className="addu-row">

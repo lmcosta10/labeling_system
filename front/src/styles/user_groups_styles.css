@@ -23,11 +23,11 @@
     font-weight: 200;
 }
 
-.removeu-btn {
+.remove-btn {
     background-color: rgb(240, 33, 33);
 }
 
-.removeu-btn:hover {
+.remove-btn:hover {
     background-color: rgb(177, 22, 22);
 }
 
