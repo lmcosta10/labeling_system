@@ -29,7 +29,7 @@ async fn main() {
     let app = Router::new()
         .route("/api/images", get(crate::image::handler::handle_gallery))
         .route("/api/login", post(crate::auth::handler::login_user))
-        .route("/api/image/{id}",get(crate::image::handler::handle_image))
+        .route("/api/image/{id}",get(crate::image::handler::handle_image_details))
         .route("/api/image/{id}/tags",post(crate::image::handler::handle_tag_post))
         .route("/api/tags/pending",get(crate::tags_requests::handler::handle_tags_requests_page))
         .route("/api/tags/{name}/approve",post(crate::tags_requests::handler::handle_tag_approval))
@@ -40,6 +40,7 @@ async fn main() {
         .route("/api/usergroups/removeuser",post(crate::user_groups::handler::handle_user_groups_deletion))
         .route("/api/addgroup",post(crate::user_groups::handler::handle_group_creation))
         .route("/api/deletegroup/{group}",post(crate::user_groups::handler::handle_group_deletion))
+        .route("/image/{imgpath}",get(crate::image::handler::handle_image))
         .layer(cors);
 
     let api_addr = env::var("API_ADDR").unwrap(); // TODO: replace unwrap

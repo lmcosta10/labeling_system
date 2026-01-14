@@ -3,6 +3,12 @@ use crate::image::repository::{
 use crate::image::model::{Image, ImgResponse, TagResponse};
 use anyhow::Result;
 use crate::auth;
+use axum::{
+    response::{IntoResponse, Response},
+    http::{StatusCode, header},
+    body::Body
+};
+use std::fs;
 
 pub async fn get_gallery(token: String) -> Vec<Image> {
     let username = auth::repository::get_username_from_session(token);
@@ -54,4 +60,14 @@ pub async fn post_tag_user(img_id: u32, action: String, tag_name: Option<String>
             success: true,
             message: "Tag registered for approval".to_string()
     })
+}
+
+pub async fn get_image(imgpath: String) -> impl IntoResponse {
+    let bytes = fs::read(format!("src/database/images/{}", imgpath)).unwrap(); // TODO: replace unwrap
+
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, "image/png")
+        .body(Body::from(bytes))
+        .unwrap() // TODO: replace unwrap
 }

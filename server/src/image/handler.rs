@@ -1,11 +1,12 @@
 use axum::http::HeaderMap;
-use axum::{Json, http::StatusCode, extract::Path};
+use axum::{Json, http::StatusCode, extract::Path,
+response::IntoResponse};
 use crate::image::service;
 use crate::image::model::Image;
 use crate::image::model::{PostTagInfo, ImgResponse, TagResponse};
 use crate::common::server_utils;
 
-pub async fn handle_image(
+pub async fn handle_image_details(
     Path(id): Path<u32>, headers: HeaderMap
 ) -> Result<Json<ImgResponse>, (StatusCode, String)> {
     let token = server_utils::extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string()))?;
@@ -45,4 +46,18 @@ pub async fn handle_gallery(
     let token = server_utils::extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string()))?;
 
     Ok(Json(service::get_gallery(token).await))
+}
+
+pub async fn handle_image(
+    Path(imgpath): Path<String>, headers: HeaderMap
+) -> impl IntoResponse {
+    let token = server_utils::extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string())).unwrap_or_default();
+    let is_user = server_utils::check_is_user(token.clone());
+
+    // BUG: auth
+    println!("Is user? {}", is_user);
+    println!("Token: {}", token);
+
+    // TODO: error handling
+    service::get_image(imgpath).await
 }
