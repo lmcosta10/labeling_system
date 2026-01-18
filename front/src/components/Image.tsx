@@ -4,6 +4,7 @@ import "../styles/image_page_styles.css"
 export type Image = {
   id: number;
   url: string;
+  blob: string | undefined;
 };
 
 interface ImageDetailsProps {
@@ -176,7 +177,7 @@ export default function ImageDetails({ selectedImage, onImageClick }: ImageDetai
       </div>
 
       <div className="image-container">
-        <img src={selectedImage.url} width={200} className="selected-img" />
+        <img src={selectedImage.blob} width={200} className="selected-img" />
       </div>
 
       <div className="tags-wrapper">

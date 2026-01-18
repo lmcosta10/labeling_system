@@ -8,11 +8,13 @@ interface GalleryProps {
 
 export default function Gallery({ onImageClick }: GalleryProps) {
     const [images, setImages] = useState<Image[]>([]);
+    const [imageSrcs, setImageSrcs] = useState<Record<number, string>>({});
     const [loading, setLoading] = useState(true);
     
     useEffect(() => {
+        const API_BASE = import.meta.env.VITE_API_URL;
+        const objectUrls: string[] = [];
         async function fetchImages() {
-            const API_BASE = import.meta.env.VITE_API_URL;
             try {
                 const userToken: string | null = localStorage.getItem('token');
                 const response = await fetch(`${API_BASE}/api/images`, {
@@ -22,8 +24,31 @@ export default function Gallery({ onImageClick }: GalleryProps) {
                     'Authorization': `Bearer ${userToken}`}
                 });
             if (!response.ok) throw new Error("Failed to fetch images");
-            const data = await response.json();
-            setImages(data);
+            const imgs: Image[] = await response.json();
+            setImages(imgs);
+
+            const srcMap: Record<number, string> = {};
+
+            await Promise.all(
+                imgs.map(async (img) => {
+                    const imgRes = await fetch(img.url, {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`,
+                    },
+                    });
+
+                    if (!imgRes.ok) return;
+
+                    const blob = await imgRes.blob();
+                    const objectUrl = URL.createObjectURL(blob);
+
+                    objectUrls.push(objectUrl);
+                    srcMap[img.id] = objectUrl;
+
+                    img.blob = objectUrl;
+                })
+            );
+            setImageSrcs(srcMap);
             } catch (err) {
             console.error(err);
             } finally {
@@ -31,6 +56,10 @@ export default function Gallery({ onImageClick }: GalleryProps) {
             }
         }
     fetchImages();
+
+    return () => {
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
     }, []); // empty dependency array => run once on mount
 
     if (loading) return <p>Loading...</p>;
@@ -41,15 +70,22 @@ export default function Gallery({ onImageClick }: GalleryProps) {
         <h2 className="gallery-title">Image Gallery</h2>
 
         <div className="gallery-grid">
-        {images.map((img) => (
-            <div
-            key={img.id}
-            className="gallery-item"
-            onClick={() => onImageClick(img)}
-            >
-            <img src={img.url} className="gallery-image" />
-            </div>
-        ))}
+            {images.map((img) => (
+                <div
+                    key={img.id}
+                    className="gallery-item"
+                    onClick={() => onImageClick(img)}
+                >
+                    {imageSrcs[img.id] ? (
+                    <img
+                        src={imageSrcs[img.id]}
+                        className="gallery-image"
+                    />
+                    ) : (
+                    <div className="image-placeholder">Loading...</div>
+                    )}
+                </div>
+            ))}
         </div>
     </div>
     );
