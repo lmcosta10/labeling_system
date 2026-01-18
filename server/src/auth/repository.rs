@@ -35,7 +35,7 @@ pub fn get_username_from_session(token: String) -> String {
     let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
-    let username_query = format!("SELECT * FROM sessions WHERE token = '{}'", token); // TODO: make it safer (from sql injection)
+    let username_query = format!("SELECT * FROM sessions WHERE token = '{}'", token); // FIXME: make it safer (from sql injection)
     let mut username_statement = conn.prepare(username_query).unwrap(); // TODO: replace unwrap
 
     let mut username = String::new();

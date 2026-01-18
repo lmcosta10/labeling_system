@@ -1,6 +1,6 @@
 use axum::http::HeaderMap;
 use axum::{Json, http::StatusCode, extract::Path,
-response::IntoResponse};
+response::{Response, IntoResponse}};
 use crate::image::service;
 use crate::image::model::Image;
 use crate::image::model::{PostTagInfo, ImgResponse, TagResponse};
@@ -50,14 +50,14 @@ pub async fn handle_gallery(
 
 pub async fn handle_image(
     Path(imgpath): Path<String>, headers: HeaderMap
-) -> impl IntoResponse {
+) -> Response {
     let token = server_utils::extract_token(&headers).ok_or((StatusCode::UNAUTHORIZED, "Missing token".to_string())).unwrap_or_default();
     let is_user = server_utils::check_is_user(token.clone());
 
-    // BUG: auth
-    println!("Is user? {}", is_user);
-    println!("Token: {}", token);
-
-    // TODO: error handling
-    service::get_image(imgpath).await
+    if is_user {
+        service::get_image(imgpath).await.into_response()
+    }
+    else {
+        (StatusCode::UNAUTHORIZED, "Not an user.").into_response()
+    }
 }
