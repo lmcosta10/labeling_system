@@ -71,6 +71,7 @@ export default function TagsApprovalPage() {
   const [tags, setTags] = useState<TagRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageSrcs, setImageSrcs] = useState<Record<string, string>>({});
 
   const API_BASE = import.meta.env.VITE_API_URL;
   const userToken: string | null = localStorage.getItem('token');
@@ -90,6 +91,33 @@ export default function TagsApprovalPage() {
       if (!response.ok) throw new Error("Failed to fetch tags");
       const data = await response.json();
       setTags(data);
+
+      const imageEntries = await Promise.all(
+      data.map(async (tag: TagRequest) => {
+        const imgRes = await fetch(tag.img_url, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        });
+
+        if (!imgRes.ok) return null;
+
+        const blob = await imgRes.blob();
+        const objectUrl = URL.createObjectURL(blob);
+
+        const key = tag.img_url + tag.new_name + tag.old_name + tag.operation;
+
+        return [key, objectUrl] as const;
+      })
+    );
+
+    const validEntries = imageEntries.filter(
+      (e): e is readonly [string, string] => e !== null
+    );
+
+    const srcMap = Object.fromEntries(validEntries);
+
+    setImageSrcs(srcMap);
     } catch (e) {
       if (e instanceof Error) {
         setError(e.message);
@@ -115,6 +143,14 @@ export default function TagsApprovalPage() {
     fetchPendingTags();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      Object.values(imageSrcs).forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+    };
+  }, [imageSrcs]);
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
@@ -129,7 +165,7 @@ export default function TagsApprovalPage() {
               <p className="old-name">Old tag: {tag.old_name}</p>
               <p className="pending-name">New tag: {tag.new_name}</p>
 
-              <img src={tag.img_url} className="pending-image" />
+              <img src={imageSrcs[tag.img_url + tag.new_name + tag.old_name + tag.operation]} className="pending-image" />
 
               <div className="pending-actions">
                 <button

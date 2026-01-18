@@ -19,27 +19,11 @@ If you want to test the site, you can get the data from the databases in /server
 
 ## Details
 
-### Structure
-
-Notation: data being sent is shown above the arrows; the way it is sent is shown below.
-
-Data flow of login and session info:
-
-![](/docs/login_flow.png)
-
-Data flow of image selection:
-
-![](/docs/image_selection_flow.png)
-
-Data flow of image uploading:
-
-![](/docs/image_upload_flow.png)
-
 ### Frontend
 
 Using Vite as build tool.
 
-The frontend style was built using AI (ChatGPT): it generated the classes and css files, which were then customized.
+The frontend style was built using AI (ChatGPT): it generated the initial classes and css files, which were then customized.
 
 ### Backend
 
@@ -52,9 +36,6 @@ As suggested by Gemini 2.5 Pro, the project structure is based on a Layered Arch
     - mod.rs: declares each module and exports its public parts
     - model.rs: structs
 
-Important tips:
-* TODO: review - repository functions preferably shouldn't call each other (it would cause a conflict for connections to the db). If they do, the called function should not be public and one of its arguments must be the SQLite connection already established to the database.
-
 ### Databases
 
 The databases are stored in a SQLite file for simplicity. They are organized as follows:
@@ -65,3 +46,7 @@ The databases are stored in a SQLite file for simplicity. They are organized as 
 * tag_requests: the image id the operation refers to, operation to be performed (add, edit or delete tag), old tag, new tag, and pending (whether the request is waiting for approval)
 * users: user data (username, password - TODO: encryption - and whether they are an admin)
 * user_groups: the group(s) each user belongs to
+
+### AI
+
+AI tag suggestions: coming soon. Currently using mock data.
