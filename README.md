@@ -4,17 +4,17 @@ Web-based data labeling platform where users can annotate images with tags.
 
 ## Set up
 
-There are some steps you need to take if you want to run this yourself:
-* Change the .env.example files (there are 2 of them: one in /server/, one in /front/) to .env files. They set some path variables.
+1) Change the .env.example files (there are 2 of them: one in /server/, one in /front/) to .env files.
 
-To setup the frontend, got to /front/ and run:
+2) To set up the frontend, got to /front/ and run:
 ```
 npm install
+npm run dev
 ```
 
-To setup the frontend, got to /server/ and run:
+3) To set up the backend, got to /server/ and run:
 ```
-cargo build
+docker compose up --build
 ```
 
 ## Using the site
@@ -37,7 +37,7 @@ The frontend style was built using AI (ChatGPT): it generated the initial classe
 
 ### Backend
 
-As suggested by Gemini 2.5 Pro, the project structure is based on a Layered Architecture (Handler -> Service -> Repository) and organized by feature, e.g. auth for user authentication.
+As suggested by Gemini 2.5 Pro, the project structure is based on a Layered Architecture (Handler -> Service -> Repository) and organized by feature, e.g. files in /auth/ handle user authentication.
 * Base architecture:
     - handler.rs: handles endpoints, calls appropriate service layer
     - service.rs: core logics, may call repository layer when handling database

@@ -1,0 +1,14 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/Dockerfile
+    ports:
+      - "7878:7878"
+    depends_on:
+      - ai-model
+
+  ai-model:
+    build: ./ai
+    ports:
+      - "5000:5000"
