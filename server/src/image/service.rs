@@ -63,7 +63,7 @@ pub async fn post_tag_user(img_id: u32, action: String, tag_name: Option<String>
 }
 
 pub async fn get_image(imgpath: String) -> impl IntoResponse {
-    let bytes = fs::read(format!("src/database/images/{}", imgpath)).unwrap(); // TODO: replace unwrap
+    let bytes = fs::read(format!("database/images/{}", imgpath)).unwrap(); // TODO: replace unwrap
 
     Response::builder()
         .status(StatusCode::OK)

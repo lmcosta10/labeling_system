@@ -1,7 +1,7 @@
 use crate::user_groups::model::UserGroupsResponse;
 
 pub fn get_all_user_groups() -> Result<Vec<UserGroupsResponse>, anyhow::Error> {
-    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db")?; // drop method is called implicitly
 
     // Get ALL user groups (in "groups" table), even if they don't have any users
     let user_groups_query = "SELECT * FROM \"groups\" LEFT JOIN user_groups
@@ -45,7 +45,7 @@ pub fn get_all_user_groups() -> Result<Vec<UserGroupsResponse>, anyhow::Error> {
 }
 
 pub fn get_username_from_session(token: String) -> String {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let username_query = format!("SELECT * FROM sessions WHERE token = '{}'", token); // TODO: make it safer (from sql injection)
@@ -60,7 +60,7 @@ pub fn get_username_from_session(token: String) -> String {
 }
 
 pub fn get_is_admin_from_username(username: String) -> bool {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let user_query = format!("SELECT * FROM users WHERE username = '{}'", username); // TODO: make it safer (from sql injection)
@@ -77,7 +77,7 @@ pub fn get_is_admin_from_username(username: String) -> bool {
 }
 
 pub fn add_user_to_group(user: String, group: u32) {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let new_ug_query = format!("INSERT INTO user_groups (\"username\", \"group\")
@@ -86,7 +86,7 @@ pub fn add_user_to_group(user: String, group: u32) {
 }
 
 pub fn remove_user_from_group(user: String, group: u32) {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let deletion_query = format!("DELETE FROM user_groups
@@ -95,7 +95,7 @@ pub fn remove_user_from_group(user: String, group: u32) {
 }
 
 pub fn add_group() {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let new_group_query = format!("INSERT INTO \"groups\" (\"group\") VALUES (NULL)"); // TODO: make it safer (from sql injection)
@@ -103,7 +103,7 @@ pub fn add_group() {
 }
 
 pub fn delete_group(group: u32) {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let delete_group_query = format!("DELETE FROM \"groups\"

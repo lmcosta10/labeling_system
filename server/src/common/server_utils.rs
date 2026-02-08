@@ -9,7 +9,7 @@ pub fn extract_token(headers: &HeaderMap) -> Option<String> {
 }
 
 pub fn check_is_user(token: String) -> bool {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let username_query = format!("SELECT * FROM sessions WHERE token = '{}'", token); // TODO: make it safer (from sql injection)

@@ -5,11 +5,21 @@ Web-based data labeling platform where users can annotate images with tags.
 ## Set up
 
 There are some steps you need to take if you want to run this yourself:
-* Change the .env.example files (there are 2 of them: one in /server, one in /front) to .env files. They set some path variables.
+* Change the .env.example files (there are 2 of them: one in /server/, one in /front/) to .env files. They set some path variables.
+
+To setup the frontend, got to /front/ and run:
+```
+npm install
+```
+
+To setup the frontend, got to /server/ and run:
+```
+cargo build
+```
 
 ## Using the site
 
-If you want to test the site, you can get the data from the databases in /server/src/database, but, to make it simple:
+If you want to test the site, you can get the data from the databases in /server/database/, but, to make it simple:
 * Users are alice, bob and charlie
 * All of the users' passwords are simply "password"
 * alice belongs to group 1
@@ -39,13 +49,14 @@ As suggested by Gemini 2.5 Pro, the project structure is based on a Layered Arch
 ### Databases
 
 The databases are stored in a SQLite file for simplicity. They are organized as follows:
+* groups
 * images: image id and url
 * image_groups: the group(s) each image belongs to
 * sessions: username and token
-* tags: tag, the image id it refers to, and if the tag is valid (whether it has been approved by an admin)
-* tag_requests: the image id the operation refers to, operation to be performed (add, edit or delete tag), old tag, new tag, and pending (whether the request is waiting for approval)
-* users: user data (username, password - TODO: encryption - and whether they are an admin)
+* tags: tag and the image id it refers to
+* tag_requests: the image id the operation refers to, operation to be performed (add, edit or delete tag), old tag (for deleting or editing) and new tag (for addition or editing)
 * user_groups: the group(s) each user belongs to
+* users: user data (username, password - TODO: encryption - and whether they are an admin)
 
 ### AI
 

@@ -2,7 +2,7 @@ use sqlite;
 use crate::image::model::{Image, TagList};
 
 pub fn get_all_images() -> Result<Vec<Image>, anyhow::Error> {
-    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db")?; // drop method is called implicitly
 
     let all_images_query = "SELECT * FROM images LIMIT 5";
     let mut all_images_statement = conn.prepare(all_images_query)?;
@@ -26,7 +26,7 @@ pub fn get_all_images() -> Result<Vec<Image>, anyhow::Error> {
 }
 
 pub fn get_all_images_by_ids(img_ids: Vec<u32>) -> Result<Vec<Image>, anyhow::Error> {
-    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db")?; // drop method is called implicitly
 
     let all_images_query = "SELECT * FROM images";
     let mut all_images_statement = conn.prepare(all_images_query)?;
@@ -52,7 +52,7 @@ pub fn get_all_images_by_ids(img_ids: Vec<u32>) -> Result<Vec<Image>, anyhow::Er
 }
 
 pub fn get_all_images_ids_by_group(group: u32) -> Vec<u32> {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let images_query = format!("SELECT * FROM image_groups WHERE \"group\" = {}", group); // group is a reserved word
@@ -70,7 +70,7 @@ pub fn get_all_images_ids_by_group(group: u32) -> Vec<u32> {
 }
 
 pub fn get_image_tags(id: u32) -> Result<TagList, anyhow::Error> {
-    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db")?; // drop method is called implicitly
 
     let all_tags_query = format!("SELECT * FROM tags WHERE img_id = {}", id);
     let mut all_tags_statement = conn.prepare(all_tags_query)?;
@@ -90,7 +90,7 @@ pub fn get_image_tags(id: u32) -> Result<TagList, anyhow::Error> {
 }
 
 pub fn set_new_tag_request(img_id: u32, tag_name: String) -> Result<u8, anyhow::Error> {
-    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db")?; // drop method is called implicitly
 
     // First, get neccessary info:
     // - highest req_key (currently, new key is equal to the highest existing key + 1)
@@ -109,7 +109,7 @@ pub fn set_new_tag_request(img_id: u32, tag_name: String) -> Result<u8, anyhow::
 }
 
 pub fn set_edit_tag_request(img_id: u32, tag_name: String, new_name: String) -> Result<u8, anyhow::Error> {
-    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db")?; // drop method is called implicitly
 
     // First, get neccessary info:
     // - highest req_key (currently, new key is equal to the highest existing key + 1)
@@ -128,7 +128,7 @@ pub fn set_edit_tag_request(img_id: u32, tag_name: String, new_name: String) -> 
 }
 
 pub fn set_delete_tag_request(img_id: u32, tag_name: String) -> Result<u8, anyhow::Error> {
-    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db")?; // drop method is called implicitly
 
     // First, get neccessary info:
     // - highest req_key (currently, new key is equal to the highest existing key + 1)

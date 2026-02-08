@@ -4,7 +4,7 @@ use anyhow::Result;
 use crate::tags_requests::model::PendingTagResponse;
 
 pub fn get_all_pending_tags () -> Result<Vec<PendingTagResponse>, anyhow::Error> {
-    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db")?; // drop method is called implicitly
 
     let all_tags_query = "SELECT * FROM tag_requests LEFT JOIN images ON tag_requests.img_id = images.id LIMIT 5";
     let mut all_tags_statement = conn.prepare(all_tags_query)?;
@@ -35,7 +35,7 @@ pub fn get_all_pending_tags () -> Result<Vec<PendingTagResponse>, anyhow::Error>
 }
 
 pub fn remove_tag_request(req_key: u32) -> Result<bool> {
-    let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db")?; // drop method is called implicitly
 
     let remove_request_query = format!("DELETE FROM tag_requests WHERE req_key={req_key}");
     let mut _remove_request_statement = conn.execute(remove_request_query)?;
@@ -47,7 +47,7 @@ pub fn approve_tag_request(req_key: u32) -> Result<bool> {
     // Scope: in order to close the connection before calling remove_tag_request(),
     // otherwise the connection to the db is locked
     {
-        let conn = sqlite::open("./src/database/labelsys.db")?; // drop method is called implicitly
+        let conn = sqlite::open("./database/labelsys.db")?; // drop method is called implicitly
 
         let tag_query = format!("SELECT * FROM tag_requests WHERE req_key={req_key}");
         let mut tag_statement = conn.prepare(tag_query)?;

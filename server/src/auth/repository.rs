@@ -3,7 +3,7 @@ use sqlite;
 use crate::user::model;
 
 pub fn get_user_by_username(username: String) -> Result<model::User, anyhow::Error> {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let user_query = format!("SELECT * FROM users WHERE username = '{}'", username); // FIXME: make it safer (from sql injection)
@@ -24,7 +24,7 @@ pub fn get_user_by_username(username: String) -> Result<model::User, anyhow::Err
 }
 
 pub fn add_session(username: String, token: String) {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
 
     let new_session_query = format!("INSERT INTO sessions (username, token)
     VALUES ('{username}','{token}')"); // FIXME: make it safer (from sql injection)
@@ -32,7 +32,7 @@ pub fn add_session(username: String, token: String) {
 }
 
 pub fn get_username_from_session(token: String) -> String {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let username_query = format!("SELECT * FROM sessions WHERE token = '{}'", token); // FIXME: make it safer (from sql injection)
@@ -47,7 +47,7 @@ pub fn get_username_from_session(token: String) -> String {
 }
 
 pub fn get_group_from_username(username: String) -> u32 {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let group_query = format!("SELECT * FROM user_groups WHERE username = '{}'", username); // TODO: make it safer (from sql injection)
@@ -63,7 +63,7 @@ pub fn get_group_from_username(username: String) -> u32 {
 }
 
 pub fn get_is_admin_from_username(username: String) -> bool {
-    let conn = sqlite::open("./src/database/labelsys.db").unwrap(); // drop method is called implicitly
+    let conn = sqlite::open("./database/labelsys.db").unwrap(); // drop method is called implicitly
     // TODO: replace unwrap
 
     let user_query = format!("SELECT * FROM users WHERE username = '{}'", username); // TODO: make it safer (from sql injection)
